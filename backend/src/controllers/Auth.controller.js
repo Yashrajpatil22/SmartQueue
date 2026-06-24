@@ -5,8 +5,12 @@ import mongoose from "mongoose";
 const createTenant = async (req, res) => {
   
   const { tenantName, phone, userName, email, password } = req.body;
-  if (!tenantName || !phone || !userName || !email || !password) {
-    return res.status(400).json({ message: "All fields are required" });
+  const fields = [tenantName, phone, userName, email, password];
+
+  if (fields.some((field) => !field?.trim())) {
+    return res.status(400).json({
+      message: "All fields are required",
+    });
   }
   const existingTenant = await Tenant.findOne({ phone });
   if (existingTenant) {
@@ -47,18 +51,19 @@ const createTenant = async (req, res) => {
     }
     await session.commitTransaction();
     // session.endSession();
+    
+
+    const accessToken = savedUser.generateAccessToken();
+    const refreshToken = savedUser.generateRefreshToken();
+    await savedUser.save({ validateBeforeSave: false });
     const registeredUser = await User.findById(user._id).select(
       "-password -refreshToken",
     );
 
-    const accessToken = registeredUser.generateAccessToken();
-    const refreshToken = registeredUser.generateRefreshToken();
-    await registeredUser.save({ validateBeforeSave: false });
-
     const options = {
-        httpOnly: true,
-        secure: true
-    }
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    };
 
     return res.status(201).cookie("accessToken", accessToken, options).cookie("refreshToken", refreshToken, options).json({
       message: "Tenant and user created successfully",
