@@ -50,10 +50,22 @@ const createTenant = async (req, res) => {
     const registeredUser = await User.findById(user._id).select(
       "-password -refreshToken",
     );
-    return res.status(201).json({
+
+    const accessToken = registeredUser.generateAccessToken();
+    const refreshToken = registeredUser.generateRefreshToken();
+    await registeredUser.save({ validateBeforeSave: false });
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res.status(201).cookie("accessToken", accessToken, options).cookie("refreshToken", refreshToken, options).json({
       message: "Tenant and user created successfully",
       savedTenant,
       registeredUser,
+      accessToken,
+      refreshToken,
     });
 
   } catch (error) {
