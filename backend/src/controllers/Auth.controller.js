@@ -79,7 +79,7 @@ const createTenant = async (req, res) => {
     if (error.code === 11000) {
       // error.keyValue will tell you which field was duplicated
       const duplicatedField = Object.keys(error.keyValue)[0];
-      return res.status(400).json({
+      return res.status(409).json({
         message: `A user or tenant with this ${duplicatedField} already exists.`,
       });
     }
