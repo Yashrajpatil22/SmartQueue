@@ -22,25 +22,27 @@ const createTenant = async (req, res) => {
   }
   const session = await mongoose.startSession();
   session.startTransaction();
-  let user;
-  let tenant;
   try {
-    tenant = await Tenant.create({
+    const tenant = new Tenant({
       name: tenantName,
       phone,
-    }, { session });
-    if (tenant) {
+    });
+
+    const savedTenant = await tenant.save({ session });
+    if (savedTenant) {
       console.log("Tenant created successfully");
     }
   
-    user = await User.create({
+    const user = new User({
       name: userName,
       email,
       password,
       role: "MANAGER",
       tenantId: tenant._id,
-    }, { session });
-    if (user) {
+    });
+
+    const savedUser = await user.save({ session });
+    if (savedUser) {
       console.log("User created successfully");
     }
     await session.commitTransaction();
@@ -50,7 +52,7 @@ const createTenant = async (req, res) => {
     );
     return res.status(201).json({
       message: "Tenant and user created successfully",
-      tenant,
+      savedTenant,
       registeredUser,
     });
 
@@ -65,10 +67,12 @@ const createTenant = async (req, res) => {
       });
     }
 
-    return res.status(500).json({ message: "Error creating user" });
+    return res.status(500).json({ message: "Error during registration", error: error.message });
   }
   finally {
     await session.endSession();
   }
   
 };
+
+export { createTenant };
