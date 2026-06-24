@@ -50,13 +50,20 @@ const createTenant = async (req, res) => {
     );
     return res.status(201).json({
       message: "Tenant and user created successfully",
-      registeredTenant,
+      tenant,
       registeredUser,
     });
 
   } catch (error) {
     await session.abortTransaction();
     // session.endSession();
+    if (error.code === 11000) {
+      // error.keyValue will tell you which field was duplicated
+      const duplicatedField = Object.keys(error.keyValue)[0];
+      return res.status(400).json({
+        message: `A user or tenant with this ${duplicatedField} already exists.`,
+      });
+    }
 
     return res.status(500).json({ message: "Error creating user" });
   }
