@@ -1,6 +1,7 @@
 import Tenant from "../models/Tenant.model.js";
 import User from "../models/User.model.js";
 import mongoose from "mongoose";
+import generateAccessAndRefreshTokens from "../utils/generateAccessAndRefreshTokens.util.js";
 
 const createTenant = async (req, res) => {
   
@@ -53,10 +54,7 @@ const createTenant = async (req, res) => {
     // session.endSession();
     
 
-    const accessToken = savedUser.generateAccessToken();
-    const refreshToken = savedUser.generateRefreshToken();
-    savedUser.refreshToken = refreshToken;
-    await savedUser.save({ validateBeforeSave: false });
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user);
     const registeredUser = await User.findById(user._id).select(
       "-password -refreshToken",
     );
@@ -111,10 +109,8 @@ const login = async (req, res) => {
     if (!isPasswordCorrect) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
-    const accessToken = user.generateAccessToken();
-    const refreshToken = user.generateRefreshToken();
-    user.refreshToken = refreshToken;
-    await user.save({ validateBeforeSave: false });
+    const { accessToken, refreshToken } =
+      await generateAccessAndRefreshTokens(user);
     const registeredUser = await User.findById(user._id).select(
       "-password -refreshToken",
     );
