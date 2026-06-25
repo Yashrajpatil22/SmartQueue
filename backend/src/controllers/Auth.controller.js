@@ -2,6 +2,7 @@ import Tenant from "../models/Tenant.model.js";
 import User from "../models/User.model.js";
 import mongoose from "mongoose";
 import generateAccessAndRefreshTokens from "../utils/generateAccessAndRefreshTokens.util.js";
+import jwt from "jsonwebtoken";
 
 const createTenant = async (req, res) => {
   
@@ -145,15 +146,15 @@ const refreshAccessToken = async (req, res) => {
     if (user.refreshToken !== refreshToken) {
       return res.status(401).json({ message: "Refresh token does not match" });
     }
-    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user);
+    const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshTokens(user);
     const options = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
     };
-    return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshToken", refreshToken, options).json({
+    return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshToken", newRefreshToken, options).json({
       message: "Access token refreshed successfully",
       accessToken,
-      refreshToken,
+      refreshToken: newRefreshToken,
     });
   }catch(error){
     if (
@@ -169,4 +170,4 @@ const refreshAccessToken = async (req, res) => {
 
 }
 
-export { createTenant, login };
+export { createTenant, login, refreshAccessToken };

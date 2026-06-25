@@ -2,6 +2,8 @@ import express from 'express';
 import connectDb from './db/index.js';
 import dotenv from 'dotenv';
 import authRouter from './routes/Auth.route.js';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 
 dotenv.config();
