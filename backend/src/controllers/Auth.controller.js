@@ -130,4 +130,43 @@ const login = async (req, res) => {
   }
 }
 
+const refreshAccessToken = async (req, res) => {
+  try{
+    const refreshToken =
+      req.cookies?.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ message: "Refresh token is required" });
+    }
+    const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const user = await User.findById(decodedToken._id).select("-password");
+    if (!user) {
+      return res.status(401).json({ message: "Invalid refresh token" });
+    }
+    if (user.refreshToken !== refreshToken) {
+      return res.status(401).json({ message: "Refresh token does not match" });
+    }
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user);
+    const options = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    };
+    return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshToken", refreshToken, options).json({
+      message: "Access token refreshed successfully",
+      accessToken,
+      refreshToken,
+    });
+  }catch(error){
+    if (
+      error instanceof jwt.TokenExpiredError ||
+      error instanceof jwt.JsonWebTokenError
+    ) {
+      return res.status(401).json({
+        message: "Invalid or expired refresh token",
+      });
+    }
+    return res.status(500).json({ message: "Error during refresh token generation", error: error.message });
+  }
+
+}
+
 export { createTenant, login };
