@@ -3,9 +3,6 @@ import mongoose from "mongoose";
 
 const createStaff = async (req, res) => {
   const manager = req.user;
-  if(manager.role !== "MANAGER"){
-    return res.status(403).json({ message: "Only managers can create staff" });
-  }
   const { name, email, password } = req.body;
   const fields = [name, email, password];
 
