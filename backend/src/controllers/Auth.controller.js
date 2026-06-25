@@ -3,6 +3,7 @@ import User from "../models/User.model.js";
 import mongoose from "mongoose";
 import generateAccessAndRefreshTokens from "../utils/generateAccessAndRefreshTokens.util.js";
 import jwt from "jsonwebtoken";
+import cookieOptions from "../constants/cookieOptions.js";
 
 const createTenant = async (req, res) => {
   
@@ -60,12 +61,8 @@ const createTenant = async (req, res) => {
       "-password -refreshToken",
     );
 
-    const options = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-    };
 
-    return res.status(201).cookie("accessToken", accessToken, options).cookie("refreshToken", refreshToken, options).json({
+    return res.status(201).cookie("accessToken", accessToken, cookieOptions).cookie("refreshToken", refreshToken, cookieOptions).json({
       message: "Tenant and user created successfully",
       savedTenant,
       registeredUser,
@@ -115,11 +112,7 @@ const login = async (req, res) => {
     const registeredUser = await User.findById(user._id).select(
       "-password -refreshToken",
     );
-    const options = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-    };
-    return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshToken", refreshToken, options).json({
+    return res.status(200).cookie("accessToken", accessToken, cookieOptions).cookie("refreshToken", refreshToken, cookieOptions).json({
       message: "Login successful",
       registeredUser,
       accessToken,
@@ -147,11 +140,7 @@ const refreshAccessToken = async (req, res) => {
       return res.status(401).json({ message: "Refresh token does not match" });
     }
     const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshTokens(user);
-    const options = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-    };
-    return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshToken", newRefreshToken, options).json({
+    return res.status(200).cookie("accessToken", accessToken, cookieOptions).cookie("refreshToken", newRefreshToken, cookieOptions).json({
       message: "Access token refreshed successfully",
       accessToken,
       refreshToken: newRefreshToken,
@@ -186,12 +175,8 @@ const logout = async (req, res) => {
     }
     user.refreshToken = null;
     await user.save({ validateBeforeSave: false });
-    const options = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-    };
-    res.clearCookie("accessToken",options);
-    res.clearCookie("refreshToken",options);
+    res.clearCookie("accessToken",cookieOptions);
+    res.clearCookie("refreshToken",cookieOptions);
     return res.status(200).json({ message: "Logout successful" });  
   }catch(error){
     if (
