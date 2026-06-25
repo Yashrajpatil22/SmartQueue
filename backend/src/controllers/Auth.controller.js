@@ -170,4 +170,40 @@ const refreshAccessToken = async (req, res) => {
 
 }
 
-export { createTenant, login, refreshAccessToken };
+const logout = async (req, res) => {
+  const refreshToken = req.cookies?.refreshToken;
+  if (!refreshToken) {
+    return res.status(400).json({ message: "Refresh token is required" });
+  }
+  try{
+    const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const user = await User.findById(decodedToken._id);
+    if (!user) {
+      return res.status(401).json({ message: "Invalid refresh token" });
+    }
+    if(user.refreshToken !== refreshToken){
+      return res.status(401).json({ message: "Refresh token does not match" });
+    }
+    user.refreshToken = null;
+    await user.save({ validateBeforeSave: false });
+    const options = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    };
+    res.clearCookie("accessToken",options);
+    res.clearCookie("refreshToken",options);
+    return res.status(200).json({ message: "Logout successful" });  
+  }catch(error){
+    if (
+      error instanceof jwt.TokenExpiredError ||
+      error instanceof jwt.JsonWebTokenError
+    ) {
+      return res.status(401).json({
+        message: "Invalid or expired refresh token",
+      });
+    }
+    return res.status(500).json({ message: "Error during logout", error: error.message });
+  }
+}
+
+export { createTenant, login, refreshAccessToken, logout };
