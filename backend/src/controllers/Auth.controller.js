@@ -55,6 +55,7 @@ const createTenant = async (req, res) => {
 
     const accessToken = savedUser.generateAccessToken();
     const refreshToken = savedUser.generateRefreshToken();
+    savedUser.refreshToken = refreshToken;
     await savedUser.save({ validateBeforeSave: false });
     const registeredUser = await User.findById(user._id).select(
       "-password -refreshToken",
@@ -92,4 +93,45 @@ const createTenant = async (req, res) => {
   
 };
 
-export { createTenant };
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  const fields = [email, password];
+
+  if (fields.some((field) => !field?.trim())) {
+    return res.status(400).json({
+      message: "All fields are required",
+    });
+  }
+  try{
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+    const isPasswordCorrect = await user.isPasswordCorrect(password);
+    if (!isPasswordCorrect) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforeSave: false });
+    const registeredUser = await User.findById(user._id).select(
+      "-password -refreshToken",
+    );
+    const options = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    };
+    return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshToken", refreshToken, options).json({
+      message: "Login successful",
+      registeredUser,
+      accessToken,
+      refreshToken,
+    });
+
+  }catch(error){
+    return res.status(500).json({ message: "Error during login", error: error.message });
+  }
+}
+
+export { createTenant, login };
