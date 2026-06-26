@@ -1,7 +1,7 @@
 import User from "../models/User.model.js";
 import mongoose from "mongoose";
 import getStaff from "../utils/getStaffFromTenant.util.js";
-import {USER_SAFE_FIELDS} from "../constants/userSelect.js";
+import USER_SAFE_FIELDS from "../constants/userSelect.js";
 
 const createStaff = async (req, res) => {
   const manager = req.user;

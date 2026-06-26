@@ -1,1 +1,2 @@
-export const USER_SAFE_FIELDS = "-password -refreshToken";
+const USER_SAFE_FIELDS = "-password -refreshToken";
+export default USER_SAFE_FIELDS;

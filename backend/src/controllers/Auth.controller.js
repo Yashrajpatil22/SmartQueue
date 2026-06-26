@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import generateAccessAndRefreshTokens from "../utils/generateAccessAndRefreshTokens.util.js";
 import jwt from "jsonwebtoken";
 import cookieOptions from "../constants/cookieOptions.js";
-import {USER_SAFE_FIELDS} from "../constants/userSelect.js";
+import USER_SAFE_FIELDS from "../constants/userSelect.js";
 
 const createTenant = async (req, res) => {
   
