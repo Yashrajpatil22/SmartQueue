@@ -62,24 +62,35 @@ const getStaffById = async (req, res) => {
 
 const getAllStaff = async (req, res) => {
   const manager = req.user;
-  let {page, limit} = req.query;
-  if(!page){
-    page = "1";
-  }
-  if(!limit){
-    limit = "5";
-  }
+  let {page = "1", limit = "5"} = req.query;
+  let {sort , order} = req.query;
+
+
+
   const pageNumber = Number.parseInt(page);
   const limitNumber = Number.parseInt(limit);
   if(isNaN(pageNumber) || pageNumber <= 0 || isNaN(limitNumber) || limitNumber <= 0){
     return res.status(400).json({ message: "Invalid page or limit values" });
   }
   const skip = (pageNumber - 1) * limitNumber;
+
+  sort ??= "createdAt";
+  order ??= sort === "name" ? "asc" : "desc";
+  const allowedSortFields = ["name", "createdAt", "updatedAt", "email"];
+  const allowedOrderValues = ["asc", "desc"];
+  
+  if(!allowedSortFields.includes(sort) || !allowedOrderValues.includes(order)) {
+    return res.status(400).json({ message: "Invalid sort or order values" });
+  }
+  const direction = order === "asc" ? 1 : -1;
+
   try {
+    const sortQuery = { [sort]: direction };
+      
     const staff = await User.find({
       role: "STAFF",
       tenantId: manager.tenantId,
-    }).select(USER_SAFE_FIELDS).skip(skip).limit(limitNumber);
+    }).select(USER_SAFE_FIELDS).sort(sortQuery).skip(skip).limit(limitNumber);
 
     const totalStaffCount = await User.countDocuments({
       role: "STAFF",
