@@ -80,9 +80,24 @@ const getAllStaff = async (req, res) => {
       role: "STAFF",
       tenantId: manager.tenantId,
     }).select(USER_SAFE_FIELDS).skip(skip).limit(limitNumber);
+
+    const totalStaffCount = await User.countDocuments({
+      role: "STAFF",
+      tenantId: manager.tenantId,
+    });
+    const totalPages = Math.ceil(totalStaffCount / limitNumber);
+    const hasNextPage = pageNumber < totalPages;
+    const hasPreviousPage = pageNumber > 1;
     return res
       .status(200)
-      .json({ message: "Staff retrieved successfully", staff });
+      .json({ message: "Staff retrieved successfully", staff, pagination: {
+        totalStaffCount,
+        totalPages,
+        hasNextPage,
+        hasPreviousPage,
+        page: pageNumber,
+        limit: limitNumber
+      } });
   } catch (error) {
     return res
       .status(500)
