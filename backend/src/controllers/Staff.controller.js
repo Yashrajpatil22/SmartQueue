@@ -25,9 +25,13 @@ const createStaff = async (req, res) => {
       role: "STAFF",
       tenantId: manager.tenantId,
     });
-    const createdStaff = await User.findById(staff._id).select("-password -refreshToken");
+    const createdStaff = await User.findById(staff._id).select(
+      "-password -refreshToken",
+    );
     if (!createdStaff) {
-      return res.status(500).json({ message: "Error retrieving created staff" });
+      return res
+        .status(500)
+        .json({ message: "Error retrieving created staff" });
     }
     return res
       .status(201)
@@ -44,15 +48,44 @@ const getStaffById = async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(staffId)) {
     return res.status(400).json({ message: "Invalid staff ID" });
   }
-  try{
-    const staff = await User.findById(staffId).select("-password -refreshToken");
+  try {
+    const staff = await User.findById(staffId).select(
+      "-password -refreshToken",
+    );
     if (!staff) {
       return res.status(404).json({ message: "Staff not found" });
     }
-    return res.status(200).json({ message: "Staff retrieved successfully", staff });
+    return res
+      .status(200)
+      .json({ message: "Staff retrieved successfully", staff });
   } catch (error) {
-    return res.status(500).json({ message: "Error retrieving staff", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Error retrieving staff", error: error.message });
   }
-}
+};
 
-export { createStaff, getStaffById };
+const getAllStaff = async (req, res) => {
+  const manager = req.user;
+  if (!manager) {
+    return res.status(403).json({ message: "Unauthorized" });
+  }
+  try {
+    const staff = await User.find({
+      role: "STAFF",
+      tenantId: manager.tenantId,
+    }).select("-password -refreshToken");
+    if(staff.length === 0) {
+      return res.status(404).json({ message: "No staff found" , staff });
+    }
+    return res
+      .status(200)
+      .json({ message: "Staff retrieven successfully", staff });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Something went wrong while retrieving staff" });
+  }
+};
+
+export { createStaff, getStaffById, getAllStaff };
