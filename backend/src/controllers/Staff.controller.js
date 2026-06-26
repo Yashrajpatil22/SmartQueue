@@ -65,8 +65,6 @@ const getAllStaff = async (req, res) => {
   let {page = "1", limit = "5"} = req.query;
   let {sort , order} = req.query;
 
-
-
   const pageNumber = Number.parseInt(page);
   const limitNumber = Number.parseInt(limit);
   if(isNaN(pageNumber) || pageNumber <= 0 || isNaN(limitNumber) || limitNumber <= 0){
@@ -76,7 +74,7 @@ const getAllStaff = async (req, res) => {
 
   sort ??= "createdAt";
   order ??= sort === "name" ? "asc" : "desc";
-  const allowedSortFields = ["name", "createdAt", "updatedAt", "email"];
+  const allowedSortFields = ["name", "createdAt", "updatedAt"];
   const allowedOrderValues = ["asc", "desc"];
   
   if(!allowedSortFields.includes(sort) || !allowedOrderValues.includes(order)) {
@@ -96,7 +94,7 @@ const getAllStaff = async (req, res) => {
       role: "STAFF",
       tenantId: manager.tenantId,
     });
-    const totalPages = Math.ceil(totalStaffCount / limitNumber);
+    const totalPages = Math.max(1, Math.ceil(totalStaffCount / limitNumber));
     const hasNextPage = pageNumber < totalPages;
     const hasPreviousPage = pageNumber > 1;
     return res
