@@ -62,14 +62,27 @@ const getStaffById = async (req, res) => {
 
 const getAllStaff = async (req, res) => {
   const manager = req.user;
+  let {page, limit} = req.query;
+  if(!page){
+    page = "1";
+  }
+  if(!limit){
+    limit = "5";
+  }
+  const pageNumber = Number.parseInt(page);
+  const limitNumber = Number.parseInt(limit);
+  if(isNaN(pageNumber) || pageNumber <= 0 || isNaN(limitNumber) || limitNumber <= 0){
+    return res.status(400).json({ message: "Invalid page or limit values" });
+  }
+  const skip = (pageNumber - 1) * limitNumber;
   try {
     const staff = await User.find({
       role: "STAFF",
       tenantId: manager.tenantId,
-    }).select(USER_SAFE_FIELDS);
+    }).select(USER_SAFE_FIELDS).skip(skip).limit(limitNumber);
     return res
       .status(200)
-      .json({ message: "Staff retrieven successfully", staff });
+      .json({ message: "Staff retrieved successfully", staff });
   } catch (error) {
     return res
       .status(500)
