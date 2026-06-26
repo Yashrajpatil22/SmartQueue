@@ -44,6 +44,10 @@ const createStaff = async (req, res) => {
 };
 
 const getStaffById = async (req, res) => {
+  const manager = req.user;
+  if (!manager) {
+    return res.status(403).json({ message: "Unauthorized" });
+  }
   const { staffId } = req.params;
   if (!mongoose.Types.ObjectId.isValid(staffId)) {
     return res.status(400).json({ message: "Invalid staff ID" });
@@ -54,6 +58,12 @@ const getStaffById = async (req, res) => {
     );
     if (!staff) {
       return res.status(404).json({ message: "Staff not found" });
+    }
+    if(!staff.tenantId.equals(manager.tenantId)) {
+      return res.status(403).json({ message: "You are not authorized to perform this action" });
+    }
+    if(staff.role !== "STAFF") {
+      return res.status(400).json({ message: "User is not a staff member" });
     }
     return res
       .status(200)
@@ -75,8 +85,8 @@ const getAllStaff = async (req, res) => {
       role: "STAFF",
       tenantId: manager.tenantId,
     }).select("-password -refreshToken");
-    if(staff.length === 0) {
-      return res.status(404).json({ message: "No staff found" , staff });
+    if (staff.length === 0) {
+      return res.status(404).json({ message: "No staff found", staff });
     }
     return res
       .status(200)
@@ -88,4 +98,33 @@ const getAllStaff = async (req, res) => {
   }
 };
 
-export { createStaff, getStaffById, getAllStaff };
+const deleteStaff = async (req, res) => {
+  const manager = req.user;
+  if (!manager) {
+    return res.status(403).json({ message: "Unauthorized" });
+  }
+  const { staffId } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(staffId)) {
+    return res.status(400).json({ message: "Invalid staff ID" });
+  }
+  try {
+    const staff = await User.findById(staffId);
+    if (!staff) {
+      return res
+        .status(404)
+        .json({ message: "Staff with this Id doesnt exist" });
+    }
+    if(!staff.tenantId.equals(manager.tenantId)) {
+      return res.status(403).json({ message: "You are not authorized to perform this action" });
+    }
+    if(staff.role !== "STAFF") {
+      return res.status(400).json({ message: "User is not a staff member" });
+    }
+    await User.deleteOne({ _id: staffId });
+    return res.status(200).json({ message: "Staff deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to delete staff" });
+  }
+};
+
+export { createStaff, getStaffById, getAllStaff, deleteStaff };
