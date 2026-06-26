@@ -39,4 +39,20 @@ const createStaff = async (req, res) => {
   }
 };
 
-export { createStaff };
+const getStaffById = async (req, res) => {
+  const { staffId } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(staffId)) {
+    return res.status(400).json({ message: "Invalid staff ID" });
+  }
+  try{
+    const staff = await User.findById(staffId).select("-password -refreshToken");
+    if (!staff) {
+      return res.status(404).json({ message: "Staff not found" });
+    }
+    return res.status(200).json({ message: "Staff retrieved successfully", staff });
+  } catch (error) {
+    return res.status(500).json({ message: "Error retrieving staff", error: error.message });
+  }
+}
+
+export { createStaff, getStaffById };
