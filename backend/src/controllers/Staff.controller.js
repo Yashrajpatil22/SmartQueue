@@ -127,4 +127,46 @@ const deleteStaff = async (req, res) => {
   }
 };
 
-export { createStaff, getStaffById, getAllStaff, deleteStaff };
+const updateStaff = async (req, res) => {
+  const manager = req.user;
+  if (!manager) {
+    return res.status(403).json({ message: "Unauthorized" });
+  }
+  const { staffId } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(staffId)) {
+    return res.status(400).json({ message: "Invalid staff ID" });
+  }
+  const { name, email, password } = req.body ?? {};
+  if(!name?.trim() && !email?.trim() && !password?.trim()) {
+    return res.status(400).json({ message: "At least one field is required to update" });
+  }
+  try{
+    const staff = await User.findById(staffId);
+    if (!staff) {
+      return res.status(404).json({ message: "Staff not found" });
+    }
+    if(!staff.tenantId.equals(manager.tenantId)) {
+      return res.status(403).json({ message: "You are not authorized to perform this action" });
+    }
+    if(staff.role !== "STAFF") {
+      return res.status(400).json({ message: "User is not a staff member" });
+    }
+    if(name?.trim()) staff.name = name;
+    if(email?.trim()){
+      const existingStaff = await User.findOne({ email });
+      if(existingStaff && !existingStaff._id.equals(staffId)) {
+        return res.status(400).json({ message: "Email is already in use by another staff member" });
+      }
+      staff.email = email;
+    }
+    if(password?.trim()) staff.password = password;
+    await staff.save();
+    const updatedStaff = await User.findById(staffId).select("-password -refreshToken");
+    return res.status(200).json({ message: "Staff updated successfully", updatedStaff });
+  }catch(error){
+    return res.status(500).json({ message: "Failed to update staff", error: error.message });
+  }
+  
+}
+
+export { createStaff, getStaffById, getAllStaff, deleteStaff, updateStaff };
