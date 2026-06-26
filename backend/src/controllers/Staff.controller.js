@@ -1,6 +1,7 @@
 import User from "../models/User.model.js";
 import mongoose from "mongoose";
 import getStaff from "../utils/getStaffFromTenant.util.js";
+import {USER_SAFE_FIELDS} from "../constants/userSelect.js";
 
 const createStaff = async (req, res) => {
   const manager = req.user;
@@ -27,7 +28,7 @@ const createStaff = async (req, res) => {
       tenantId: manager.tenantId,
     });
     const createdStaff = await User.findById(staff._id).select(
-      "-password -refreshToken",
+      USER_SAFE_FIELDS,
     );
     if (!createdStaff) {
       return res
@@ -65,7 +66,7 @@ const getAllStaff = async (req, res) => {
     const staff = await User.find({
       role: "STAFF",
       tenantId: manager.tenantId,
-    }).select("-password -refreshToken");
+    }).select(USER_SAFE_FIELDS);
     return res
       .status(200)
       .json({ message: "Staff retrieven successfully", staff });
@@ -108,7 +109,7 @@ const updateStaff = async (req, res) => {
     }
     if(password?.trim()) staff.password = password;
     await staff.save();
-    const updatedStaff = await User.findById(staffId).select("-password -refreshToken");
+    const updatedStaff = await User.findById(staffId).select(USER_SAFE_FIELDS);
     return res.status(200).json({ message: "Staff updated successfully", updatedStaff });
   }catch(error){
     return res.status(500).json({ message: "Failed to update staff", error: error.message });

@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import generateAccessAndRefreshTokens from "../utils/generateAccessAndRefreshTokens.util.js";
 import jwt from "jsonwebtoken";
 import cookieOptions from "../constants/cookieOptions.js";
+import {USER_SAFE_FIELDS} from "../constants/userSelect.js";
 
 const createTenant = async (req, res) => {
   
@@ -58,7 +59,7 @@ const createTenant = async (req, res) => {
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user);
     const registeredUser = await User.findById(user._id).select(
-      "-password -refreshToken",
+      USER_SAFE_FIELDS,
     );
 
 
@@ -110,7 +111,7 @@ const login = async (req, res) => {
     const { accessToken, refreshToken } =
       await generateAccessAndRefreshTokens(user);
     const registeredUser = await User.findById(user._id).select(
-      "-password -refreshToken",
+      USER_SAFE_FIELDS,
     );
     return res.status(200).cookie("accessToken", accessToken, cookieOptions).cookie("refreshToken", refreshToken, cookieOptions).json({
       message: "Login successful",
