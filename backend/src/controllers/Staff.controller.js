@@ -64,6 +64,11 @@ const getAllStaff = async (req, res) => {
   const manager = req.user;
   let {page = "1", limit = "5"} = req.query;
   let {sort , order} = req.query;
+  const search = req.query.search?.trim() ?? "";
+  const filter = {
+    role: "STAFF",
+    tenantId: manager.tenantId,
+  }
 
   const pageNumber = Number.parseInt(page);
   const limitNumber = Number.parseInt(limit);
@@ -82,18 +87,19 @@ const getAllStaff = async (req, res) => {
   }
   const direction = order === "asc" ? 1 : -1;
 
+  if(search) {
+    filter.$or = [
+      { name: { $regex: search, $options: "i" } },
+      { email: { $regex: search, $options: "i" } }
+    ];
+  }
+
   try {
     const sortQuery = { [sort]: direction };
       
-    const staff = await User.find({
-      role: "STAFF",
-      tenantId: manager.tenantId,
-    }).select(USER_SAFE_FIELDS).sort(sortQuery).skip(skip).limit(limitNumber);
+    const staff = await User.find(filter).select(USER_SAFE_FIELDS).sort(sortQuery).skip(skip).limit(limitNumber);
 
-    const totalStaffCount = await User.countDocuments({
-      role: "STAFF",
-      tenantId: manager.tenantId,
-    });
+    const totalStaffCount = await User.countDocuments(filter);
     const totalPages = Math.max(1, Math.ceil(totalStaffCount / limitNumber));
     const hasNextPage = pageNumber < totalPages;
     const hasPreviousPage = pageNumber > 1;
