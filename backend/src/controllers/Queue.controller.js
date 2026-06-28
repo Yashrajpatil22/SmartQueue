@@ -101,11 +101,17 @@ const getAllQueues = async (req, res) => {
     }
     const direction = order === "asc" ? 1 : -1;
 
+    const {search} = req.query;
+    const filter = {
+        tenantId: manager.tenantId,
+    }
+
     try{
         const sortQuery = {[sort]: direction};
-        const queues = await Queue.find({
-          tenantId: manager.tenantId,
-        })
+        if(search) {
+            filter.name = { $regex: search, $options: "i" };
+        }
+        const queues = await Queue.find(filter)
           .sort(sortQuery)
           .skip(skip)
           .limit(limitNumber);
