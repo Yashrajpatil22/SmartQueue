@@ -46,4 +46,36 @@ const createQueue = async (req, res) => {
   }
 };
 
-export { createQueue };
+const getQueueFromId = async (req, res) => {
+    const { queueId } = req.params;
+    const manager = req.user;
+
+    if (!mongoose.Types.ObjectId.isValid(queueId)) {
+        return res.status(400).json({
+            message: "Invalid queue ID",
+        });
+    }
+    try{
+        const queue = await Queue.findOne({
+            _id: queueId,
+            tenantId: manager.tenantId,
+        });
+        if (!queue) {
+            return res.status(404).json({
+                message: "Queue not found",
+            });
+        }
+        return res.status(200).json({
+            message: "Queue found",
+            queue,
+        });
+    }catch (error) {
+        return res.status(500).json({
+            message: "Error fetching queue",
+            error: error.message,
+        });
+    }
+
+}
+
+export { createQueue, getQueueFromId };
