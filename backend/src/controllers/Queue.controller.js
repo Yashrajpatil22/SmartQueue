@@ -78,4 +78,22 @@ const getQueueFromId = async (req, res) => {
 
 }
 
-export { createQueue, getQueueFromId };
+const getAllQueues = async (req, res) => {
+    const manager = req.user;
+    try{
+        const queues = await Queue.find({
+            tenantId: manager.tenantId,
+        });
+        return res.status(200).json({
+            message: "Queues found",
+            queues,
+        });
+    }catch (error) {
+        return res.status(500).json({
+            message: "Error fetching queues",
+            error: error.message,
+        });
+    }
+}
+
+export { createQueue, getQueueFromId, getAllQueues};
