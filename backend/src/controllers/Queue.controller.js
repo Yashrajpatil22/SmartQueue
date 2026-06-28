@@ -1,5 +1,6 @@
 import Queue from "../models/Queue.model.js";
 import mongoose from "mongoose";
+import getQueue from "../utils/getQueue.js";
 
 const createQueue = async (req, res) => {
   const manager = req.user;
@@ -56,10 +57,7 @@ const getQueueFromId = async (req, res) => {
         });
     }
     try{
-        const queue = await Queue.findOne({
-            _id: queueId,
-            tenantId: manager.tenantId,
-        });
+        const queue = await getQueue(manager.tenantId, queueId);
         if (!queue) {
             return res.status(404).json({
                 message: "Queue not found",
@@ -137,10 +135,7 @@ const deleteQueue = async (req, res) => {
         });
     }
     try{
-        const queue = await Queue.findOne({
-            _id: queueId,
-            tenantId: manager.tenantId,
-        });
+        const queue = await getQueue(manager.tenantId, queueId);
         if (!queue) {
             return res.status(404).json({
                 message: "Queue not found",
@@ -175,10 +170,7 @@ const updateQueue = async (req, res) => {
         });
     }
     try{
-        const queue = await Queue.findOne({
-            _id: queueId,
-            tenantId: manager.tenantId
-        });
+        const queue = await getQueue(manager.tenantId, queueId);
         if (!queue) {
             return res.status(404).json({
                 message: "Queue not found",
