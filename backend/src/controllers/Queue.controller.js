@@ -99,7 +99,7 @@ const getAllQueues = async (req, res) => {
     }
     const direction = order === "asc" ? 1 : -1;
 
-    const {search} = req.query;
+    const search = req.query.search?.trim() ?? "";
     const filter = {
         tenantId: manager.tenantId,
     }
@@ -113,9 +113,23 @@ const getAllQueues = async (req, res) => {
           .sort(sortQuery)
           .skip(skip)
           .limit(limitNumber);
+
+        const totalQueues = await Queue.countDocuments(filter);
+        const totalPages = Math.max(1, Math.ceil(totalQueues / limitNumber));
+        const hasNextPage = pageNumber < totalPages;
+        const hasPreviousPage = pageNumber > 1;
         return res.status(200).json({
             message: "Queues found",
             queues,
+            pagination: {
+                totalQueues,
+                totalPages,
+                hasNextPage,
+                hasPreviousPage,
+                page: pageNumber,
+                limit: limitNumber,
+
+            }
         });
     }catch (error) {
         return res.status(500).json({
