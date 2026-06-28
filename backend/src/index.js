@@ -5,6 +5,7 @@ import authRouter from './routes/Auth.route.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import staffRouter from './routes/Staff.route.js';
+import queueRouter from './routes/Queue.route.js';
 
 dotenv.config();
 const app = express();
@@ -15,6 +16,7 @@ app.use(cookieParser());
 app.use(cors());
 app.use('/api/auth', authRouter);
 app.use('/api/staff', staffRouter);
+app.use('/api/queue', queueRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello, World!');
