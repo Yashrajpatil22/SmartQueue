@@ -127,4 +127,60 @@ const deleteQueue = async (req, res) => {
     }
 }
 
-export { createQueue, getQueueFromId, getAllQueues, deleteQueue };
+const updateQueue = async (req, res) => {
+    const { queueId } = req.params;
+    const manager = req.user;
+    const name = req.body.name?.trim() ?? "";
+    const description = req.body.description?.trim() ?? "";
+
+    if (!mongoose.Types.ObjectId.isValid(queueId)) {
+        return res.status(400).json({
+            message: "Invalid queue ID",
+        });
+    }
+    if(!name && !description) {
+        return res.status(400).json({
+            message: "At least one field (name or description) is required to update",
+        });
+    }
+    try{
+        const queue = await Queue.findOne({
+            _id: queueId,
+            tenantId: manager.tenantId
+        });
+        if (!queue) {
+            return res.status(404).json({
+                message: "Queue not found",
+            });
+        }
+        if(name){
+            const existingQueue = await Queue.findOne({
+                name,
+                tenantId: manager.tenantId
+            });
+            if(existingQueue && !existingQueue._id.equals(queueId)) {
+                return res.status(400).json({
+                    message: "Queue with this name already exists",
+                });
+            }
+            queue.name = name;
+
+        }
+        if(description){
+            queue.description = description;
+            
+        }
+        await queue.save();
+        return res.status(200).json({
+            message: "Queue updated successfully",
+            queue,
+        });
+    }catch (error) {
+        return res.status(500).json({
+            message: "Error updating queue",
+            error: error.message,
+        });
+    }
+}
+
+export { createQueue, getQueueFromId, getAllQueues, deleteQueue, updateQueue };
