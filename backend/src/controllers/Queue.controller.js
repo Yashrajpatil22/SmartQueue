@@ -80,10 +80,35 @@ const getQueueFromId = async (req, res) => {
 
 const getAllQueues = async (req, res) => {
     const manager = req.user;
+    const { limit="5", page="1" } = req.query;
+    const pageNumber = Number.parseInt(page);
+    const limitNumber = Number.parseInt(limit);
+    if(isNaN(pageNumber) || pageNumber <= 0 || isNaN(limitNumber) || limitNumber <= 0){
+        return res.status(400).json({ message: "Invalid page or limit values" });
+    }
+    const skip = (pageNumber - 1) * limitNumber;
+
+    let {sort, order} = req.query;
+    sort ??= "createdAt";
+    order ??= sort === "name" ? "asc" : "desc"; 
+    const allowedSortFields = ["name", "createdAt", "updatedAt"];
+    const allowedOrderValues = ["asc", "desc"];
+    if (
+      (!allowedSortFields.includes(sort)) ||
+      (!allowedOrderValues.includes(order))
+    ) {
+      return res.status(400).json({ message: "Invalid sort or order values" });
+    }
+    const direction = order === "asc" ? 1 : -1;
+
     try{
+        const sortQuery = {[sort]: direction};
         const queues = await Queue.find({
-            tenantId: manager.tenantId,
-        });
+          tenantId: manager.tenantId,
+        })
+          .sort(sortQuery)
+          .skip(skip)
+          .limit(limitNumber);
         return res.status(200).json({
             message: "Queues found",
             queues,
