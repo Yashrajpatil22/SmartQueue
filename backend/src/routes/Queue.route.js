@@ -38,7 +38,7 @@ router
   .route("/:queueId/skip")
   .post(verifyJWT, authorizeRoles("MANAGER", "STAFF"), skipCustomer);
 
-router.route("/:queueId/:entryId/cancel")
+router.route("/:queueId/entry/:entryId/cancel")
   .post(cancelEntry);
 
 

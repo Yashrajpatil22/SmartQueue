@@ -318,11 +318,6 @@ const cancelEntry = async (req, res) => {
         message: "Queue entry not found",
       });
     }
-    if(TERMINAL_QUEUE_STATUSES.includes(queueEntry.status)) {
-      return res.status(400).json({
-        message: "Queue entry is already in a terminal status",
-      });
-    }
     if(queueEntry.status != "WAITING") {
       return res.status(400).json({
         message: "Only waiting customers can be cancelled",
