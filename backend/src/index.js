@@ -6,7 +6,6 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import staffRouter from './routes/Staff.route.js';
 import queueRouter from './routes/Queue.route.js';
-import queueOperationsRouter from './routes/QueueOperations.route.js';
 
 dotenv.config();
 const app = express();
@@ -18,7 +17,7 @@ app.use(cors());
 app.use('/api/auth', authRouter);
 app.use('/api/staff', staffRouter);
 app.use('/api/queue', queueRouter);
-app.use('/api/queue-operations', queueOperationsRouter);
+
 
 app.get('/', (req, res) => {
   res.send('Hello, World!');

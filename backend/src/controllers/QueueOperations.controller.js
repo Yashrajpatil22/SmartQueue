@@ -304,6 +304,45 @@ const skipCustomer = async (req, res) => {
   }
 };
 
+const cancelEntry = async (req, res) => {
+  const { queueId, entryId } = req.params;
+  let session;
+  try{
+    const queue = await getQueueUsingId(queueId);
+    const queueEntry = await QueueEntry.findOne({
+      _id: entryId,
+      queueId: queueId,
+    });
+    if(!queueEntry) {
+      return res.status(404).json({
+        message: "Queue entry not found",
+      });
+    }
+    if(TERMINAL_QUEUE_STATUSES.includes(queueEntry.status)) {
+      return res.status(400).json({
+        message: "Queue entry is already in a terminal status",
+      });
+    }
+    if(queueEntry.status != "WAITING") {
+      return res.status(400).json({
+        message: "Only waiting customers can be cancelled",
+      });
+    }
+    queueEntry.status = "CANCELLED";
+    await queueEntry.save();
+    return res.status(200).json({
+      message: "Queue entry cancelled successfully",
+      cancelledEntry: queueEntry,
+    });
+  }catch (error) {
+    return res.status(500).json({
+      message: "Error cancelling queue entry",
+      error: error.message,
+    });
+  }
+
+}
 
 
-export { joinQueue, callNextCustomer, serveCustomer, skipCustomer };
+
+export { joinQueue, callNextCustomer, serveCustomer, skipCustomer, cancelEntry };
