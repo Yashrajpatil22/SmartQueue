@@ -163,6 +163,12 @@ const deleteQueue = async (req, res) => {
         message: "Queue not found",
       });
     }
+    const queueEntries = await QueueEntry.countDocuments({ queueId: queue._id, status: { $in: ACTIVE_QUEUE_STATUSES } });
+    if (queueEntries > 0) {
+      return res.status(400).json({
+        message: "Cannot delete queue with active entries",
+      });
+    }
     await queue.deleteOne();
     return res.status(200).json({
       message: "Queue deleted successfully",
