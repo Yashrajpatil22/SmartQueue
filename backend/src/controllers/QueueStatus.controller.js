@@ -53,9 +53,12 @@ const queueEntryStatus = async (req, res) => {
             });
         }
         const customerAheadCount = await QueueEntry.countDocuments({
-            queueDate: entry.queueDate,
-            queueId: entry.queueId,
-            status: QUEUE_ENTRY_STATUS.WAITING,
+          queueDate: entry.queueDate,
+          queueId: entry.queueId,
+          status: QUEUE_ENTRY_STATUS.WAITING,
+          tokenNumber: {
+            $lt: entry.tokenNumber,
+          },
         });
 
         return res.status(200).json({
@@ -75,4 +78,32 @@ const queueEntryStatus = async (req, res) => {
     }
 }
 
-export { queueStatus, queueEntryStatus };
+const getQueueAnalytics = async (req, res) => {
+    const { queueId } = req.params;
+    try{
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const queue = await getQueueUsingId(queueId);
+        const totalEntries = await QueueEntry.countDocuments({ queueId, queueDate: today });
+        const skippedEntries = await QueueEntry.countDocuments({ queueId, status: QUEUE_ENTRY_STATUS.SKIPPED, queueDate: today });
+        const cancelledEntries = await QueueEntry.countDocuments({ queueId, status: QUEUE_ENTRY_STATUS.CANCELLED, queueDate: today });
+        const servedEntries = await QueueEntry.countDocuments({ queueId, status: QUEUE_ENTRY_STATUS.SERVED, queueDate: today });
+        const waitingEntries = await QueueEntry.countDocuments({ queueId, status: QUEUE_ENTRY_STATUS.WAITING, queueDate: today });
+        return res.status(200).json({
+            message: "Queue analytics fetched successfully",
+            analytics: {
+                "totalEntries": totalEntries,
+                "skippedEntries": skippedEntries,
+                "cancelledEntries": cancelledEntries,
+                "servedEntries": servedEntries,
+                "waitingEntries": waitingEntries,
+            }})
+    }catch(error){
+        return res.status(500).json({
+            message: "Error fetching queue analytics",
+            error: error.message,
+        });
+    }
+}
+
+export { queueStatus, queueEntryStatus, getQueueAnalytics };
