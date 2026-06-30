@@ -1,8 +1,12 @@
 import Queue from "../models/Queue.model.js";
 import mongoose from "mongoose";
-import {getQueue, getQueueFromId} from "../utils/getQueue.js";
+import { getQueue, getQueueUsingId } from "../utils/getQueue.js";
 import QueueEntry from "../models/QueueEntry.model.js";
-import queueStatus from "../utils/queueStatus.js";
+import {
+  QUEUE_ENTRY_STATUS,
+  ACTIVE_QUEUE_STATUSES,
+  TERMINAL_QUEUE_STATUSES,
+} from "../constants/queueStatus.js";
 
 const createQueue = async (req, res) => {
   const manager = req.user;
@@ -232,14 +236,10 @@ const joinQueue = async (req, res) => {
       message: "Customer name and phone number are required",
     });
   }
-  const session = await mongoose.startSession();
+  let session;
   try {
-    const queue = await getQueueFromId(queueId);
-    if (!queue) {
-      return res.status(404).json({
-        message: "Queue not found",
-      });
-    }
+    const queue = await getQueueUsingId(queueId);
+
     if (queue.status !== "OPEN") {
       return res.status(400).json({
         message: "Queue is not open for joining",
@@ -252,23 +252,46 @@ const joinQueue = async (req, res) => {
         $in: ACTIVE_QUEUE_STATUSES,
       },
     });
-    if(existingCustomer) {
+    if (existingCustomer) {
       return res.status(409).json({
         message: "Customer is already in the queue",
       });
     }
-    
+    session = await mongoose.startSession();
     session.startTransaction();
+    const updatedQueue = await Queue.findOneAndUpdate(
+      {
+        _id: queueId,
+        status: "OPEN",
+      },
+      {
+        $inc: {
+          nextTokenNumber: 1,
+        },
+      },
+      {
+        new: false,
+        session,
+      },
+    );
+    if (!updatedQueue) {
+      await session.abortTransaction();
+      await session.endSession();
+
+      return res.status(400).json({
+        message: "Queue is no longer open",
+      });
+    }
     const queueEntry = new QueueEntry({
       queueId,
       customerName,
       phoneNumber,
       tenantId: queue.tenantId,
-      tokenNumber: queue.nextTokenNumber,
+      tokenNumber: updatedQueue.nextTokenNumber,
     });
-    await queueEntry.save({session});
-    queue.nextTokenNumber += 1;
-    await queue.save({session});
+    await queueEntry.save({ session });
+    // queue.nextTokenNumber += 1;
+    // await queue.save({session});
     await session.commitTransaction();
     await session.endSession();
     return res.status(201).json({
@@ -276,8 +299,23 @@ const joinQueue = async (req, res) => {
       queueEntry,
     });
   } catch (error) {
-    await session.abortTransaction();
-    await session.endSession();
+    if (session) {
+      await session.abortTransaction();
+      await session.endSession();
+    }
+
+    if (error.message === "Queue not found") {
+      return res.status(404).json({
+        message: error.message,
+      });
+    }
+
+    if (error.message === "Invalid queue ID") {
+      return res.status(400).json({
+        message: error.message,
+      });
+    }
+
     return res.status(500).json({
       message: "Error joining queue",
       error: error.message,
@@ -285,4 +323,11 @@ const joinQueue = async (req, res) => {
   }
 };
 
-export { createQueue, getQueueFromId, getAllQueues, deleteQueue, updateQueue };
+export {
+  createQueue,
+  getQueueFromId,
+  getAllQueues,
+  deleteQueue,
+  updateQueue,
+  joinQueue,
+};

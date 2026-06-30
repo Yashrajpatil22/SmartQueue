@@ -16,7 +16,7 @@ const getQueue = async (tenantId, queueId) => {
 
 }
 
-const getQueueFromId = async (queueId) => {
+const getQueueUsingId = async (queueId) => {
     if (!mongoose.Types.ObjectId.isValid(queueId)) {
         throw new Error("Invalid queue ID");
     }
@@ -27,4 +27,4 @@ const getQueueFromId = async (queueId) => {
     return queue;
 }
 
-export { getQueue, getQueueFromId };
+export { getQueue, getQueueUsingId };

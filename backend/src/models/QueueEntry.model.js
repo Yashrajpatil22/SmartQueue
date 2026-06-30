@@ -41,9 +41,28 @@ const queueEntrySchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User"
     },
+    queueDate: {
+      type: Date,
+      default: () => {
+        const date = new Date();
+        date.setHours(0, 0, 0, 0);
+        return date;
+      }
+    }
   },
   {
     timestamps: true,
+  },
+);
+
+queueEntrySchema.index(
+  {
+    queueId: 1,
+    tokenNumber: 1,
+    queueDate: 1,
+  },
+  {
+    unique: true,
   },
 );
 
