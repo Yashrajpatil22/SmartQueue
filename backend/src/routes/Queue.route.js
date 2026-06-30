@@ -4,7 +4,6 @@ import {
   getAllQueues,
   deleteQueue,
   updateQueue,
-  joinQueue,
 } from "../controllers/Queue.controller.js";
 import verifyJWT from "../middleware/auth.middleware.js";
 import authorizeRoles from "../middleware/roles.middleware.js";
@@ -17,7 +16,5 @@ router.route("/:queueId").get(verifyJWT,authorizeRoles("MANAGER"), getQueueFromI
 router.route("/").get(verifyJWT, authorizeRoles("MANAGER"), getAllQueues);
 router.route("/:queueId").delete(verifyJWT, authorizeRoles("MANAGER"), deleteQueue);
 router.route("/:queueId").put(verifyJWT, authorizeRoles("MANAGER"), updateQueue);
-
-router.route("/:queueId/join").post(joinQueue);
 
 export default router;
