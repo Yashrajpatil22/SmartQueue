@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const queueEntrySchema = new mongoose.Schema(
   {
-    CustomerName: {
+    customerName: {
       type: String,
       required: true,
       trim: true,

@@ -16,4 +16,15 @@ const getQueue = async (tenantId, queueId) => {
 
 }
 
-export default getQueue;
+const getQueueFromId = async (queueId) => {
+    if (!mongoose.Types.ObjectId.isValid(queueId)) {
+        throw new Error("Invalid queue ID");
+    }
+    const queue = await Queue.findById(queueId);
+    if (!queue) {
+        throw new Error("Queue not found");
+    }
+    return queue;
+}
+
+export { getQueue, getQueueFromId };
