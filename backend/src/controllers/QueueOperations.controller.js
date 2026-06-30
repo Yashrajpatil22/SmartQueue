@@ -187,4 +187,66 @@ const callNextCustomer = async (req, res) => {
   }
 };
 
-export { joinQueue, callNextCustomer };
+const serveCustomer = async (req, res) => {
+  const { queueId } = req.params;
+  let session;
+  try{
+    const queue = await getQueueUsingId(queueId);
+    if(queue.status !== "OPEN") {
+      return res.status(400).json({
+        message: "Queue is not open for serving customer",
+      });
+    }
+    if(queue.currentServing === null) {
+      return res.status(400).json({
+        message: "No customer is currently being served",
+      });
+    }
+    session = await mongoose.startSession();
+    session.startTransaction();
+    const updatedQueueEntry = await QueueEntry.findOneAndUpdate(
+      {
+        _id: queue.currentServing,
+        status: "CALLED",
+      },
+      {
+        status: "SERVED",
+        servedAt: new Date(),
+        servedBy: req.user._id,
+      },
+      {
+        returnDocument: "after",
+        session,
+      }
+    );
+    if(!updatedQueueEntry) {
+      await session.abortTransaction();
+      await session.endSession();
+      return res.status(400).json({
+        message: "No customer is currently being served",
+      });
+    }
+    queue.currentServing = null;
+    await queue.save({session});
+    await session.commitTransaction();
+    await session.endSession();
+    return res.status(200).json({
+      message: "Customer served successfully",
+      servedCustomer: updatedQueueEntry,
+    });
+  }
+    catch (error) {
+      if (session) {
+        await session.abortTransaction();
+        await session.endSession();
+      }
+      return res.status(500).json({
+        message: "Error serving customer",
+        error: error.message,
+      });
+    }
+}
+
+
+
+export { joinQueue, callNextCustomer, serveCustomer };
