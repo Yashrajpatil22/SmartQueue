@@ -219,6 +219,13 @@ const serveCustomer = async (req, res) => {
         session,
       }
     );
+
+    const requiredTime = (updatedQueueEntry.servedAt - updatedQueueEntry.calledAt) / (1000 * 60);
+    const newAverageServiceTime = (queue.averageServiceTime * queue.customersServed + requiredTime) / (queue.customersServed + 1);
+    queue.averageServiceTime = newAverageServiceTime;
+    queue.customersServed += 1;
+    await queue.save({session});
+
     if(!updatedQueueEntry) {
       await session.abortTransaction();
       await session.endSession();

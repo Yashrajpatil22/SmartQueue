@@ -35,6 +35,10 @@ const queueSchema = new Schema(
       ref: "User",
       required: true,
     },
+    customersServed: {
+      type: Number,
+      default: 0,
+    },
     averageServiceTime: {
       type: Number,
       default: 0,

@@ -28,6 +28,7 @@ const queueStatus = async (req, res) => {
         },
         "waitingCustomers": waitingCount,
         "nextTokenNumber": queue.nextTokenNumber,
+        "averageServiceTime": queue.averageServiceTime,
       },
     });
   } catch (error) {
@@ -46,7 +47,7 @@ const queueEntryStatus = async (req, res) => {
       });
     }
     try{
-        const entry = await QueueEntry.findById(entryId);
+        const entry = await QueueEntry.findById(entryId).populate("queueId");
         if (!entry) {
             return res.status(404).json({
                 message: "Queue entry not found",
@@ -67,6 +68,7 @@ const queueEntryStatus = async (req, res) => {
                 "tokenNumber": entry.tokenNumber,
                 "status": entry.status,
                 "customerAheadCount": customerAheadCount,
+                "waitingTimeEstimate": customerAheadCount * entry.queueId.averageServiceTime,
             },
         });
 
