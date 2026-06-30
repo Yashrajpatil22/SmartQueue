@@ -105,4 +105,86 @@ const joinQueue = async (req, res) => {
   }
 };
 
-export { joinQueue };
+const callNextCustomer = async (req, res) => {
+  const { queueId } = req.params;
+  let session;
+  try {
+    const queue = await getQueueUsingId(queueId);
+    if (queue.status !== "OPEN") {
+      return res.status(400).json({
+        message: "Queue is not open for calling next customer",
+      });
+    }
+    if (queue.currentServing !== null) {
+      return res.status(409).json({
+        message: "There is already a customer being served",
+      });
+    }
+    session = await mongoose.startSession();
+    session.startTransaction();
+    const nextCustomer = await QueueEntry.findOneAndUpdate(
+      {
+        queueId,
+        status: "WAITING",
+      },
+      {
+        status: "CALLED",
+        calledAt: new Date(),
+      },
+      {
+        sort: {
+          tokenNumber: 1,
+        },
+        returnDocument: "after",
+        session,
+      },
+    );
+    if (!nextCustomer) {
+      await session.abortTransaction();
+      await session.endSession();
+      return res.status(404).json({
+        message: "No waiting customer found",
+      });
+
+    }
+    const updatedQueue = await Queue.findOneAndUpdate(
+      {
+        _id: queueId,
+        status: "OPEN",
+        currentServing: null,
+      },
+      {
+        currentServing: nextCustomer._id,
+      },
+      {
+        returnDocument: "after",
+        session,
+      },
+    );
+    if(!updatedQueue) {
+      await session.abortTransaction();
+      await session.endSession();
+      return res.status(409).json({
+        message: "Another staff member has already called the next customer.",
+      });
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+    return res.status(200).json({
+      message: "Next customer called successfully",
+      nextCustomer,
+    });
+  } catch (error) {
+    if (session) {
+      await session.abortTransaction();
+      await session.endSession();
+    }
+    return res.status(500).json({
+      message: "Error calling next customer",
+      error: error.message,
+    });
+  }
+};
+
+export { joinQueue, callNextCustomer };
