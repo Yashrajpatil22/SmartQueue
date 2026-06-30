@@ -38,4 +38,41 @@ const queueStatus = async (req, res) => {
   }
 };
 
-export { queueStatus };
+const queueEntryStatus = async (req, res) => {
+    const { entryId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(entryId)) {
+      return res.status(400).json({
+        message: "Invalid entry ID",
+      });
+    }
+    try{
+        const entry = await QueueEntry.findById(entryId);
+        if (!entry) {
+            return res.status(404).json({
+                message: "Queue entry not found",
+            });
+        }
+        const customerAheadCount = await QueueEntry.countDocuments({
+            queueDate: entry.queueDate,
+            queueId: entry.queueId,
+            status: QUEUE_ENTRY_STATUS.WAITING,
+        });
+
+        return res.status(200).json({
+            message: "Queue entry status fetched successfully",
+            entry: {
+                "tokenNumber": entry.tokenNumber,
+                "status": entry.status,
+                "customerAheadCount": customerAheadCount,
+            },
+        });
+
+    }catch(error){
+        return res.status(500).json({
+            message: "Error fetching queue entry status",
+            error: error.message,
+        });
+    }
+}
+
+export { queueStatus, queueEntryStatus };

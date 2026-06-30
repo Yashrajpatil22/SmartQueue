@@ -13,7 +13,8 @@ import {
   cancelEntry,
 } from "../controllers/QueueOperations.controller.js";
 import {
-  queueStatus
+  queueStatus,
+  queueEntryStatus,
 } from "../controllers/QueueStatus.controller.js";
 import verifyJWT from "../middleware/auth.middleware.js";
 import authorizeRoles from "../middleware/roles.middleware.js";
@@ -46,5 +47,6 @@ router.route("/:queueId/entry/:entryId/cancel")
 
 // Queue Status Route
 router.route("/:queueId/status").get(queueStatus);
+router.route("/entry/:entryId/status").get(queueEntryStatus);
 
 export default router;
