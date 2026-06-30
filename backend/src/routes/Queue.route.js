@@ -12,6 +12,9 @@ import {
   skipCustomer,
   cancelEntry,
 } from "../controllers/QueueOperations.controller.js";
+import {
+  queueStatus
+} from "../controllers/QueueStatus.controller.js";
 import verifyJWT from "../middleware/auth.middleware.js";
 import authorizeRoles from "../middleware/roles.middleware.js";
 import {Router} from "express";
@@ -41,5 +44,7 @@ router
 router.route("/:queueId/entry/:entryId/cancel")
   .post(cancelEntry);
 
+// Queue Status Route
+router.route("/:queueId/status").get(queueStatus);
 
 export default router;
