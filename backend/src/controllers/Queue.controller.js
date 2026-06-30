@@ -298,6 +298,23 @@ const closeQueue = async (req, res) => {
         message: "Queue is already closed",
       });
     }
+    if (queue.currentServing !== null) {
+      return res.status(400).json({
+        message: "Cannot close queue while a customer is being served.",
+      });
+    }
+    const activeEntries = await QueueEntry.countDocuments({
+      queueId: queue._id,
+      status: {
+        $in: ACTIVE_QUEUE_STATUSES,
+      },
+    });
+
+    if (activeEntries > 0) {
+      return res.status(400).json({
+        message: "Cannot close queue while customers are waiting.",
+      });
+    }
     queue.status = "CLOSED";
     await queue.save();
     return res.status(200).json({
