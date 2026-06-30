@@ -232,6 +232,86 @@ const updateQueue = async (req, res) => {
   }
 };
 
+const pauseQueue = async (req, res) => {
+  const { queueId } = req.params;
+  const manager = req.user;
+  try{
+    const queue = await getQueue(manager.tenantId, queueId);
+    if(queue.status === "PAUSED"){
+      return res.status(400).json({
+        message: "Queue is already paused",
+      });
+    }
+    if(queue.status === "CLOSED"){
+      return res.status(400).json({
+        message: "Queue is closed and cannot be paused",
+      });
+    }
+    queue.status = "PAUSED";
+    await queue.save();
+    return res.status(200).json({
+      message: "Queue paused successfully",
+      queue,
+    });
+  }catch(error){
+    return res.status(500).json({
+      message: "Error pausing queue",
+      error: error.message,
+    });
+  }
+}
+const resumeQueue = async (req, res) => {
+  const { queueId } = req.params;
+  const manager = req.user;
+  try{
+    const queue = await getQueue(manager.tenantId, queueId);
+    if(queue.status === "OPEN"){
+      return res.status(400).json({
+        message: "Queue is already open",
+      });
+    }
+    if(queue.status === "CLOSED"){
+      return res.status(400).json({
+        message: "Queue is closed and cannot be resumed",
+      });
+    }
+    queue.status = "OPEN";
+    await queue.save();
+    return res.status(200).json({
+      message: "Queue resumed successfully",
+      queue,
+    });
+  }catch(error){
+    return res.status(500).json({
+      message: "Error resuming queue",
+      error: error.message,
+    });
+  }
+}
+const closeQueue = async (req, res) => {
+  const { queueId } = req.params;
+  const manager = req.user;
+  try{
+    const queue = await getQueue(manager.tenantId, queueId);
+    if(queue.status === "CLOSED"){
+      return res.status(400).json({
+        message: "Queue is already closed",
+      });
+    }
+    queue.status = "CLOSED";
+    await queue.save();
+    return res.status(200).json({
+      message: "Queue closed successfully",
+      queue,
+    });
+  }catch(error){
+    return res.status(500).json({
+      message: "Error closing queue",
+      error: error.message,
+    });
+  }
+}
+
 
 
 export {
@@ -240,5 +320,8 @@ export {
   getAllQueues,
   deleteQueue,
   updateQueue,
-
+  pauseQueue,
+  closeQueue,
+  resumeQueue,
 };
+
