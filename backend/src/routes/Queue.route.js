@@ -7,6 +7,7 @@ import {
   pauseQueue,
   closeQueue,
   resumeQueue,
+  openQueue
 } from "../controllers/Queue.controller.js";
 import {
   joinQueue,
@@ -36,6 +37,7 @@ router.route("/:queueId").put(verifyJWT, authorizeRoles("MANAGER"), updateQueue)
 router.route("/:queueId/pause").post(verifyJWT, authorizeRoles("MANAGER"), pauseQueue);
 router.route("/:queueId/resume").post(verifyJWT, authorizeRoles("MANAGER"), resumeQueue);
 router.route("/:queueId/close").post(verifyJWT, authorizeRoles("MANAGER"), closeQueue);
+router.route("/:queueId/open").post(verifyJWT, authorizeRoles("MANAGER"), openQueue);
 
 // Queue Operations Routes
 router.route("/:queueId/join").post(joinQueue);

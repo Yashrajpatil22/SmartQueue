@@ -298,11 +298,7 @@ const closeQueue = async (req, res) => {
         message: "Queue is already closed",
       });
     }
-    if (queue.currentServing !== null) {
-      return res.status(400).json({
-        message: "Cannot close queue while a customer is being served.",
-      });
-    }
+    
     const activeEntries = await QueueEntry.countDocuments({
       queueId: queue._id,
       status: {
@@ -312,7 +308,7 @@ const closeQueue = async (req, res) => {
 
     if (activeEntries > 0) {
       return res.status(400).json({
-        message: "Cannot close queue while customers are waiting.",
+        message: "Cannot close queue while customers are waiting or being served.",
       });
     }
     queue.status = "CLOSED";
@@ -329,6 +325,34 @@ const closeQueue = async (req, res) => {
   }
 }
 
+const openQueue = async (req, res) => {
+  const { queueId } = req.params;
+  const manager = req.user;
+  try{
+    const queue = await getQueue(manager.tenantId, queueId);
+    if(queue.status !== "CLOSED"){
+      return res.status(400).json({
+        message: "Queue is not closed",
+      });
+    }
+    queue.status = "OPEN";
+    queue.currentServing = null;
+    queue.nextTokenNumber = 1;
+    queue.averageServiceTime = 0;
+    queue.customersServed = 0;
+    await queue.save();
+    return res.status(200).json({
+      message: "Queue opened successfully",
+      queue,
+    });
+  }catch(error){
+    return res.status(500).json({
+      message: "Error opening queue",
+      error: error.message,
+    });
+  }
+}
+
 
 
 export {
@@ -340,5 +364,6 @@ export {
   pauseQueue,
   closeQueue,
   resumeQueue,
+  openQueue
 };
 
