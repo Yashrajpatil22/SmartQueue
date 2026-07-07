@@ -35,6 +35,9 @@ io.on("connection", (socket) => {
   socket.emit("welcome", {
     message: "Welcome to SmartQueue",
   });
+  socket.on("helloServer", (data) => {
+    console.log(data.message);
+  });
 });
 
 

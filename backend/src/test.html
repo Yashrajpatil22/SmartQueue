@@ -13,6 +13,7 @@
       socket.on("welcome", (data) => {
         console.log(data.message);
       });
+      socket.emit("helloServer", { message: "Hello from client" });
     </script>
   </body>
 </html>
