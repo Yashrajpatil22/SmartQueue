@@ -10,6 +10,9 @@
     <script src="http://localhost:3001/socket.io/socket.io.js"></script>
     <script>
       const socket = io("http://localhost:3001");
+      socket.on("welcome", (data) => {
+        console.log(data.message);
+      });
     </script>
   </body>
 </html>
