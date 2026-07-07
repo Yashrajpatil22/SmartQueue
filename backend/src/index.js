@@ -1,14 +1,22 @@
 import express from 'express';
 import connectDb from './db/index.js';
 import dotenv from 'dotenv';
+import http from 'http';
 import authRouter from './routes/Auth.route.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import staffRouter from './routes/Staff.route.js';
 import queueRouter from './routes/Queue.route.js';
+import { Server } from 'socket.io';
 
 dotenv.config();
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server,{
+  cors:{
+    origin: "http://127.0.0.1:5500"
+  }
+});
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
@@ -22,10 +30,13 @@ app.use('/api/queue', queueRouter);
 app.get('/', (req, res) => {
   res.send('Hello, World!');
 });
+io.on('connection', (socket) => {
+  console.log('A user connected');
+});
 
 connectDb()
     .then(() => {
-        app.listen(PORT, () => {
+        server.listen(PORT, () => {
           console.log(`Server is running on port ${PORT}`);
         });
     })
