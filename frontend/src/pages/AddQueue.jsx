@@ -8,6 +8,10 @@ function AddQueue() {
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if(!name.trim()){
+            console.error("Queue name is required");
+            return;
+        }
         try {
           const response = await axios.post(
             `${import.meta.env.VITE_API_URL}/api/queue`,

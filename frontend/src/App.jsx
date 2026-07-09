@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import Register from "./pages/Register";
 import QueueList from "./pages/QueueList";
 import AddQueue from "./pages/AddQueue";
+import QueueDetails from "./pages/QueueDetails";
 import './App.css'
 
 function App() {
@@ -25,6 +26,11 @@ function App() {
       <Route path="/add-queue" element={
         <ProtectedRoute>
           <AddQueue />
+        </ProtectedRoute>
+      } />
+      <Route path="/queue/:id" element={
+        <ProtectedRoute>
+          <QueueDetails />
         </ProtectedRoute>
       } />
     </Routes>
