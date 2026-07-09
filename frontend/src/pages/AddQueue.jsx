@@ -1,8 +1,30 @@
 import React from 'react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 function AddQueue() {
     const [name, setName] = React.useState('');
     const [description, setDescription] = React.useState('');
+    const navigate = useNavigate();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          const response = await axios.post(
+            `${import.meta.env.VITE_API_URL}/api/queue`,
+            {
+              name,
+              description,
+            },
+            {
+              withCredentials: true,
+            },
+          );
+          console.log(response.data);
+          navigate("/queue-list");
+        } catch (err) {
+          console.error("Error adding queue:", err);
+        }
+    }
   return (
     <div className="flex flex-col gap-6 items-center justify-center min-h-screen bg-gray-100">
       {/* <h1 className="text-3xl font-bold text-gray-900">SmartQueue</h1> */}
@@ -10,7 +32,7 @@ function AddQueue() {
         <h2 className="text-2xl font-bold mb-5 text-center text-gray-900">
           Add Queue
         </h2>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="mb-5">
             <label className="block mb-2 font-medium">Queue Name</label>
             <input
