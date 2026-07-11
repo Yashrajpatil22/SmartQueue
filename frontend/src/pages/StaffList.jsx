@@ -1,0 +1,61 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+function StaffList() {
+  const [staff, setStaff] = useState([]);
+  useEffect(() => {
+    try{
+        const fetchStaff = async () => {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/staff`, {
+                withCredentials: true,
+            });
+            setStaff(response.data.staff);
+        }
+        fetchStaff();
+    }catch(err){
+        console.log("Failed to fetch staff data:", err);
+    }
+  }, []);
+  return (
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
+      <h1 className="text-3xl font-bold mb-8 text-gray-900">
+        Staff Management
+      </h1>
+
+      <div className="w-full max-w-3xl space-y-4">
+        {staff.map((member) => (
+          <div
+            key={member._id}
+            className="bg-white border border-gray-200 rounded-2xl shadow p-5 flex justify-between items-center hover:border-blue-500 transition-colors duration-200"
+          >
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">
+                {member.name}
+              </h2>
+
+              <p className="text-gray-600">{member.email}</p>
+
+              <p className="text-sm text-gray-500">{member.role}</p>
+            </div>
+
+            <div className="flex gap-3">
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg cursor-pointer">
+                Edit
+              </button>
+
+              <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg cursor-pointer">
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+
+        <button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-2xl cursor-pointer transition-colors duration-200">
+          Add Staff
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default StaffList;
