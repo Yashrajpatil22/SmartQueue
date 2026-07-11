@@ -46,8 +46,13 @@ function QueueDetails() {
       socket.connect();
       
       socket.emit("joinQueue",id);
+      socket.on("queueUpdated", () => {
+        console.log("Queue updated event received");
+        fetchQueueDetails();
+      });
 
       return() => {
+        socket.off("queueUpdated");
         socket.disconnect();
       }
     },[id])

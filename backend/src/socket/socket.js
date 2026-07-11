@@ -25,6 +25,8 @@ export const initializeSocket = (server) => {
         console.log("A user disconnected");
       });
       socket.on("joinQueue", (queueId) => {
+        socket.join(queueId);
+        console.log(socket.rooms);
         console.log(`Socket: ${socket.id} User joined queue: ${queueId}`);
       });
     });

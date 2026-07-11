@@ -7,6 +7,7 @@ import {
   ACTIVE_QUEUE_STATUSES,
   TERMINAL_QUEUE_STATUSES,
 } from "../constants/queueStatus.js";
+import { getIo } from "../socket/socket.js";
 
 const joinQueue = async (req, res) => {
   const { queueId } = req.params;
@@ -171,6 +172,9 @@ const callNextCustomer = async (req, res) => {
 
     await session.commitTransaction();
     await session.endSession();
+
+    const io = getIo();
+    io.to(queueId).emit("queueUpdated");
     return res.status(200).json({
       message: "Next customer called successfully",
       nextCustomer,
