@@ -26,8 +26,8 @@ export const initializeSocket = (server) => {
       });
       socket.on("joinQueue", (queueId) => {
         socket.join(queueId);
-        console.log(socket.rooms);
-        console.log(`Socket: ${socket.id} User joined queue: ${queueId}`);
+        // console.log(socket.rooms);
+        // console.log(`Socket: ${socket.id} User joined queue: ${queueId}`);
       });
     });
 }
