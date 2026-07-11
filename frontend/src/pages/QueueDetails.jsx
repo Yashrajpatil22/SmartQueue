@@ -34,6 +34,38 @@ function QueueDetails() {
         }
         fetchQueueDetails();
     }, []);
+
+    const callNext = async () => {
+      try{
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/queue/${id}/call-next`, {}, {
+          withCredentials: true,
+        });
+        console.log("Call Next response:", response.data);
+      }catch(err){
+        console.log("Error calling next token:", err);
+      }
+    }
+
+    const serve = async () => {
+      try{
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/queue/${id}/serve`, {}, {
+          withCredentials: true,
+        });
+        console.log("Serve response:", response.data);
+      }catch(err){
+        console.log("Error serving token:", err);
+      }
+    }
+    const skip = async () => {
+      try{
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/queue/${id}/skip`, {}, {
+          withCredentials: true,
+        });
+        console.log("Skip response:", response.data);
+      }catch(err){
+        console.log("Error skipping token:", err);
+      }
+    }
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white p-8 w-150 rounded-2xl shadow-lg border border-gray-200">
@@ -83,15 +115,21 @@ function QueueDetails() {
         </div>
 
         <div className="grid grid-cols-3 gap-4 mt-10">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg cursor-pointer transition-colors duration-200">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg cursor-pointer transition-colors duration-200"
+          onClick={callNext}
+          >
             Call Next
           </button>
 
-          <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg cursor-pointer transition-colors duration-200">
+          <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg cursor-pointer transition-colors duration-200"
+          onClick={serve}
+          >
             Serve
           </button>
 
-          <button className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg cursor-pointer transition-colors duration-200">
+          <button className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg cursor-pointer transition-colors duration-200"
+          onClick={skip}
+          >
             Skip
           </button>
         </div>
