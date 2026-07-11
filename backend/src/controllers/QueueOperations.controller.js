@@ -241,6 +241,8 @@ const serveCustomer = async (req, res) => {
     await queue.save({session});
     await session.commitTransaction();
     await session.endSession();
+    const io = getIo();
+    io.to(queueId).emit("queueUpdated");
     return res.status(200).json({
       message: "Customer served successfully",
       servedCustomer: updatedQueueEntry,
@@ -299,6 +301,8 @@ const skipCustomer = async (req, res) => {
     await queue.save({ session });
     await session.commitTransaction();
     await session.endSession();
+    const io = getIo();
+    io.to(queueId).emit("queueUpdated");
     return res.status(200).json({
       message: "Customer skipped successfully",
       skippedCustomer: updatedQueueEntry,
