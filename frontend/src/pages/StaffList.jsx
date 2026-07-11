@@ -6,17 +6,22 @@ function StaffList() {
   const [staff, setStaff] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
-    try{
+    
         const fetchStaff = async () => {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/staff`, {
-                withCredentials: true,
-            });
-            setStaff(response.data.staff);
-        }
-        fetchStaff();
-    }catch(err){
-        console.log("Failed to fetch staff data:", err);
+            try {
+              const response = await axios.get(
+                `${import.meta.env.VITE_API_URL}/api/staff`,
+                {
+                  withCredentials: true,
+                },
+              );
+              setStaff(response.data.staff);
+            } catch (err) {
+              console.log("Failed to fetch staff data:", err);
+            }
+        
     }
+    fetchStaff();
   }, []);
 
   const deleteStaff = async (staffId) => {
@@ -27,7 +32,6 @@ function StaffList() {
         if(response.status === 200){
             setStaff(staff.filter(member => member._id !== staffId));
         }
-        navigate("/staff-list");
     }catch(err){
         console.log("Failed to delete staff member:", err);
     }

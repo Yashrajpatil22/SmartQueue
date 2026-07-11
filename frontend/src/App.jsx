@@ -7,6 +7,7 @@ import QueueList from "./pages/QueueList";
 import AddQueue from "./pages/AddQueue";
 import QueueDetails from "./pages/QueueDetails";
 import StaffList from "./pages/StaffList";
+import AddStaff from "./pages/AddStaff";
 import './App.css'
 
 function App() {
@@ -37,6 +38,11 @@ function App() {
       <Route path="/staff-list" element={
         <ProtectedRoute>
           <StaffList />
+        </ProtectedRoute>
+      } />
+      <Route path="/add-staff" element={
+        <ProtectedRoute>
+          <AddStaff />
         </ProtectedRoute>
       } />
       <Route path="*" element={<Navigate to="/login" />} />
