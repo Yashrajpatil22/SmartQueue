@@ -44,8 +44,7 @@ function QueueDetails() {
 
     useEffect(() => {
       socket.connect();
-      console.log(id);
-      console.log(typeof id);
+      
       socket.emit("joinQueue",id);
 
       return() => {
