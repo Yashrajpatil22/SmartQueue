@@ -42,6 +42,9 @@ io.on("connection", (socket) => {
   socket.on("helloServer", (data) => {
     console.log(data.message);
   });
+  socket.on("disconnect", () => {
+    console.log("A user disconnected");
+  });
 });
 
 

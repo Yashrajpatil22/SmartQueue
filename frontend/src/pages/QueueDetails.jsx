@@ -1,6 +1,7 @@
 import React,{useEffect} from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
+import socket from '../services/socket'
 
 function QueueDetails() {
     const {id} = useParams();
@@ -12,28 +13,43 @@ function QueueDetails() {
     const[customersServed, setCustomersServed] = React.useState(0);
     const[averageServiceTime, setAverageServiceTime] = React.useState(0);
 
-    useEffect(() => {
-        const fetchQueueDetails = async () => {
-            try{
-                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/queue/${id}`, {
-                    withCredentials: true,
-                });
-                // console.log(response.data.queue);
 
-                const queue = response.data.queue;
-                setName(queue.name);
-                setDescription(queue.description);
-                setStatus(queue.status);
-                setCurrentServing(queue.currentServing);
-                setNextTokenNumber(queue.nextTokenNumber);
-                setCustomersServed(queue.customersServed);
-                setAverageServiceTime(queue.averageServiceTime);
-            }catch(err){
-                console.error("Error fetching queue details:", err);
-            }
-        }
+    const fetchQueueDetails = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/queue/${id}`,
+          {
+            withCredentials: true,
+          },
+        );
+        // console.log(response.data.queue);
+
+        const queue = response.data.queue;
+        setName(queue.name);
+        setDescription(queue.description);
+        setStatus(queue.status);
+        setCurrentServing(queue.currentServing);
+        setNextTokenNumber(queue.nextTokenNumber);
+        setCustomersServed(queue.customersServed);
+        setAverageServiceTime(queue.averageServiceTime);
+      } catch (err) {
+        console.error("Error fetching queue details:", err);
+      }
+    };
+
+    useEffect(() => {
+        
         fetchQueueDetails();
-    }, []);
+    }, [id]);
+
+    useEffect(() => {
+      socket.connect();
+      socket.emit("joinQueue",{id});
+
+      return() => {
+        socket.disconnect();
+      }
+    },[id])
 
     const callNext = async () => {
       try{
