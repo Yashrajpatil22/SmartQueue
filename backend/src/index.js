@@ -45,6 +45,9 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("A user disconnected");
   });
+  socket.on("joinQueue", (queueId) => {
+    console.log(`Socket: ${socket.id} User joined queue: ${queueId}`);
+  });
 });
 
 

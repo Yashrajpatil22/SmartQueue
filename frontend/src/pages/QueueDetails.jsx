@@ -40,11 +40,13 @@ function QueueDetails() {
     useEffect(() => {
         
         fetchQueueDetails();
-    }, [id]);
+    }, []);
 
     useEffect(() => {
       socket.connect();
-      socket.emit("joinQueue",{id});
+      console.log(id);
+      console.log(typeof id);
+      socket.emit("joinQueue",id);
 
       return() => {
         socket.disconnect();
