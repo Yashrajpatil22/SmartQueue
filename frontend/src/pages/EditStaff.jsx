@@ -6,20 +6,21 @@ import { useNavigate, useParams } from "react-router-dom";
 function EditStaff() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+//   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const {id} = useParams();
 
   useEffect(() => {
     const fetchStaffDetails = async () => {
         try{
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/staff/${id}`,{
-            }, {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/staff/${id}`,
+                 {
                 withCredentials: true,
             });
-            setName(response.data.name);
-            setEmail(response.data.email);
-            setPassword(response.data.password);
+            console.log(response);
+            setName(response.data.staff.name);
+            setEmail(response.data.staff.email);
+            // setPassword(response.data.password);
         }catch(err){
             console.log("Failed to fetch staff details:", err);
         }
@@ -35,7 +36,7 @@ function EditStaff() {
         {
           name,
           email,
-          password,
+        //   password,
         },
         {
           withCredentials: true,
@@ -43,7 +44,7 @@ function EditStaff() {
       );
       navigate("/staff-list");
     } catch (err) {
-      console.log("Failed to add staff member:", err);
+      console.log("Failed to edit staff member:", err);
     }
   };
   return (
@@ -78,7 +79,7 @@ function EditStaff() {
             />
           </div>
 
-          <div>
+          {/* <div>
             <label className="block mb-2 font-medium text-gray-700">
               Password
             </label>
@@ -89,7 +90,7 @@ function EditStaff() {
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter password"
             />
-          </div>
+          </div> */}
 
           <button
             type="submit"
