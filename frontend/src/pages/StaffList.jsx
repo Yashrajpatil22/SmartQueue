@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function StaffList() {
   const [staff, setStaff] = useState([]);
+  const navigate = useNavigate();
   useEffect(() => {
     try{
         const fetchStaff = async () => {
@@ -16,6 +18,20 @@ function StaffList() {
         console.log("Failed to fetch staff data:", err);
     }
   }, []);
+
+  const deleteStaff = async (staffId) => {
+    try{
+        const response = await axios.delete(`${import.meta.env.VITE_API_URL}/api/staff/${staffId}`, {
+            withCredentials: true,
+        });
+        if(response.status === 200){
+            setStaff(staff.filter(member => member._id !== staffId));
+        }
+        navigate("/staff-list");
+    }catch(err){
+        console.log("Failed to delete staff member:", err);
+    }
+  }
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
       <h1 className="text-3xl font-bold mb-8 text-gray-900">
@@ -43,7 +59,9 @@ function StaffList() {
                 Edit
               </button>
 
-              <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg cursor-pointer">
+              <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg cursor-pointer"
+              onClick={() => deleteStaff(member._id)}
+              >
                 Delete
               </button>
             </div>
