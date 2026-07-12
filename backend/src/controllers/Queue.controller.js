@@ -62,7 +62,7 @@ const getQueueFromId = async (req, res) => {
     });
   }
   try {
-    const queue = await getQueue(manager.tenantId, queueId);
+    const queue = await (await getQueue(manager.tenantId, queueId)).populate("tenantId", "name");
     if (!queue) {
       return res.status(404).json({
         message: "Queue not found",
@@ -71,6 +71,10 @@ const getQueueFromId = async (req, res) => {
     return res.status(200).json({
       message: "Queue found",
       queue,
+      tenant: {
+        _id: queue.tenantId._id,
+        name: queue.tenantId.name,
+      }
     });
   } catch (error) {
     return res.status(500).json({
