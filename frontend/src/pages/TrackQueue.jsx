@@ -98,11 +98,6 @@ function TrackQueue() {
           </div>
         </div>
 
-        <div className="mt-10 border-t pt-5 text-center">
-          <p className="text-gray-500 text-sm">
-            This page updates automatically.
-          </p>
-        </div>
       </div>
     </div>
   );

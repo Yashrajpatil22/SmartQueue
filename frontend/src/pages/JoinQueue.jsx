@@ -44,7 +44,7 @@ function JoinQueue() {
               },
             );
             console.log("Successfully joined the queue:", response.data);
-            navigate(`/queue/${id}`);
+            navigate(`/track-queue/${response.data.queueEntry._id}`);
         }catch(error){
             console.error("Error joining queue:", error);
         }
