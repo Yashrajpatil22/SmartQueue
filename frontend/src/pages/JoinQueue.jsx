@@ -1,13 +1,14 @@
 import React, {useState, useEffect} from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 function JoinQueue() {
     const {id} = useParams();
+    const navigate = useNavigate();
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
-    const [queueName, setQueueName] = useState('Sample Queue');
-    const [businessName, setBusinessName] = useState('Sample Business');
+    const [queueName, setQueueName] = useState('');
+    const [businessName, setBusinessName] = useState('');
 
     useEffect(() => {
 
@@ -43,6 +44,7 @@ function JoinQueue() {
               },
             );
             console.log("Successfully joined the queue:", response.data);
+            navigate(`/queue/${id}`);
         }catch(error){
             console.error("Error joining queue:", error);
         }

@@ -47,7 +47,7 @@ const queueEntryStatus = async (req, res) => {
       });
     }
     try{
-        const entry = await QueueEntry.findById(entryId).populate("queueId");
+        const entry = await QueueEntry.findById(entryId).populate("queueId").populate("tenantId");
         if (!entry) {
             return res.status(404).json({
                 message: "Queue entry not found",
@@ -69,6 +69,8 @@ const queueEntryStatus = async (req, res) => {
                 "status": entry.status,
                 "customerAheadCount": customerAheadCount,
                 "waitingTimeEstimate": customerAheadCount * entry.queueId.averageServiceTime,
+                "queueName": entry.queueId.name,
+                "businessName": entry.tenantId.name,
             },
         });
 
