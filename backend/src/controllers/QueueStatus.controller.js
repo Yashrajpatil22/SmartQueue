@@ -62,8 +62,6 @@ const queueEntryStatus = async (req, res) => {
             $lt: entry.tokenNumber,
           },
         });
-        const io = getIo();
-        io.to(entry.queueId).emit("queueUpdated");
 
         return res.status(200).json({
             message: "Queue entry status fetched successfully",
@@ -72,6 +70,7 @@ const queueEntryStatus = async (req, res) => {
                 "status": entry.status,
                 "customerAheadCount": customerAheadCount,
                 "waitingTimeEstimate": customerAheadCount * entry.queueId.averageServiceTime,
+                "queueId": entry.queueId._id,
                 "queueName": entry.queueId.name,
                 "businessName": entry.tenantId.name,
             },

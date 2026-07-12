@@ -12,6 +12,7 @@ function TrackQueue() {
     const [position, setPosition] = useState();
     const [status, setStatus] = useState('');
     const [estimatedWait, setEstimatedWait] = useState();
+    const [queueId, setQueueId] = useState('');
 
 
     const fetchQueueStatus = async () => {
@@ -29,6 +30,7 @@ function TrackQueue() {
         setPosition(response.data.entry.customerAheadCount + 1);
         setStatus(response.data.entry.status);
         setEstimatedWait(response.data.entry.waitingTimeEstimate);
+        setQueueId(response.data.entry.queueId);
       } catch (error) {
         console.error("Error fetching queue status:", error);
       }
@@ -40,9 +42,10 @@ function TrackQueue() {
     },[]);
 
     useEffect(() => {
+        if(!queueId) return;
       socket.connect();
-
-      socket.emit("joinQueue", id);
+        console.log(queueId);
+      socket.emit("joinQueue", queueId);
       socket.on("queueUpdated", () => {
         // console.log("Queue updated event received");
         fetchQueueStatus();
@@ -52,7 +55,7 @@ function TrackQueue() {
         socket.off("queueUpdated");
         socket.disconnect();
       };
-    }, [id]);
+    }, [queueId]);
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
