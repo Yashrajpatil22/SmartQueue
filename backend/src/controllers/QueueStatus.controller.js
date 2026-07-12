@@ -7,6 +7,7 @@ import {
   TERMINAL_QUEUE_STATUSES,
 } from "../constants/queueStatus.js";
 import { getQueueUsingId } from "../utils/getQueue.js";
+import {getIo} from "../socket/socket.js";
 
 const queueStatus = async (req, res) => {
   const { queueId } = req.params;
@@ -61,6 +62,8 @@ const queueEntryStatus = async (req, res) => {
             $lt: entry.tokenNumber,
           },
         });
+        const io = getIo();
+        io.to(entry.queueId).emit("queueUpdated");
 
         return res.status(200).json({
             message: "Queue entry status fetched successfully",

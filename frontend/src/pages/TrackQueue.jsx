@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import { useEffect } from 'react';
+import socket from '../services/socket'
 
 function TrackQueue() {
     const {id} = useParams();
@@ -12,28 +13,46 @@ function TrackQueue() {
     const [status, setStatus] = useState('');
     const [estimatedWait, setEstimatedWait] = useState();
 
+
+    const fetchQueueStatus = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/queue/entry/${id}/status`,
+          {
+            withCredentials: true,
+          },
+        );
+        // console.log(response.data);
+        setQueueName(response.data.entry.queueName);
+        setBusinessName(response.data.entry.businessName);
+        setTokenNumber(response.data.entry.tokenNumber);
+        setPosition(response.data.entry.customerAheadCount + 1);
+        setStatus(response.data.entry.status);
+        setEstimatedWait(response.data.entry.waitingTimeEstimate);
+      } catch (error) {
+        console.error("Error fetching queue status:", error);
+      }
+    };
+
     useEffect(() => {
-        const fetchQueueStatus = async () => {
-            try{
-                const response = await axios.get(
-                    `${import.meta.env.VITE_API_URL}/api/queue/entry/${id}/status`,
-                    {
-                        withCredentials: true,
-                    }
-                );
-                console.log(response.data);
-                setQueueName(response.data.entry.queueName);
-                setBusinessName(response.data.entry.businessName);
-                setTokenNumber(response.data.entry.tokenNumber);
-                setPosition(response.data.entry.customerAheadCount + 1);
-                setStatus(response.data.entry.status);
-                setEstimatedWait(response.data.entry.estimatedWait);
-            }catch(error){
-                console.error("Error fetching queue status:", error);
-            }
-        }
+        
         fetchQueueStatus();
-    });
+    },[]);
+
+    useEffect(() => {
+      socket.connect();
+
+      socket.emit("joinQueue", id);
+      socket.on("queueUpdated", () => {
+        // console.log("Queue updated event received");
+        fetchQueueStatus();
+      });
+
+      return () => {
+        socket.off("queueUpdated");
+        socket.disconnect();
+      };
+    }, [id]);
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
