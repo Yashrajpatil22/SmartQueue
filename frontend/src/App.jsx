@@ -14,6 +14,8 @@ import JoinQueue from "./pages/JoinQueue";
 import EditQueue from "./pages/EditQueue";
 import Analytics from "./pages/Analytics";
 import CustomerList from "./pages/CustomerList";
+import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
 import './App.css'
 
 function App() {
@@ -79,6 +81,16 @@ function App() {
       <Route path="/customer-list/:queueId" element={
         <ProtectedRoute>
           <CustomerList />
+        </ProtectedRoute>
+      } />
+      <Route path="/profile" element={
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
+      } />
+      <Route path="/update-profile" element={
+        <ProtectedRoute>
+          <EditProfile />
         </ProtectedRoute>
       } />
       <Route path="*" element={<Navigate to="/login" />} />

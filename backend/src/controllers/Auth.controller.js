@@ -205,4 +205,24 @@ const getCurrentUser = async (req, res) => {
 
 }
 
-export { createTenant, login, refreshAccessToken, logout, getCurrentUser };
+const updateProfile = async (req, res) => {
+  const { name, email } = req.body || {};
+  const user = req.user;
+  if (!name?.trim() && !email?.trim()) {
+    return res.status(400).json({ message: "Name and email are required" });
+  }
+  try{
+    if (name?.trim()) {
+      user.name = name;
+    }
+    if (email?.trim()) {
+      user.email = email;
+    }
+    await user.save();
+    return res.status(200).json({ message: "Profile updated successfully", user });
+  }catch(error){
+    return res.status(500).json({ message: "Error updating profile", error: error.message });
+  }
+}
+
+export { createTenant, login, refreshAccessToken, logout, getCurrentUser, updateProfile };
