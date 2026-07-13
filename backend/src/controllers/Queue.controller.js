@@ -7,6 +7,7 @@ import {
   ACTIVE_QUEUE_STATUSES,
   TERMINAL_QUEUE_STATUSES,
 } from "../constants/queueStatus.js";
+import { getIo } from "../socket/socket.js";
 
 const createQueue = async (req, res) => {
   const manager = req.user;
@@ -62,7 +63,9 @@ const getQueueFromId = async (req, res) => {
     });
   }
   try {
-    const queue = await (await getQueue(manager.tenantId, queueId)).populate("tenantId", "name");
+    const queue = await (
+      await getQueue(manager.tenantId, queueId)
+    ).populate("tenantId", "name");
     if (!queue) {
       return res.status(404).json({
         message: "Queue not found",
@@ -74,7 +77,7 @@ const getQueueFromId = async (req, res) => {
       tenant: {
         _id: queue.tenantId._id,
         name: queue.tenantId.name,
-      }
+      },
     });
   } catch (error) {
     return res.status(500).json({
@@ -167,7 +170,10 @@ const deleteQueue = async (req, res) => {
         message: "Queue not found",
       });
     }
-    const queueEntries = await QueueEntry.countDocuments({ queueId: queue._id, status: { $in: ACTIVE_QUEUE_STATUSES } });
+    const queueEntries = await QueueEntry.countDocuments({
+      queueId: queue._id,
+      status: { $in: ACTIVE_QUEUE_STATUSES },
+    });
     if (queueEntries > 0) {
       return res.status(400).json({
         message: "Cannot delete queue with active entries",
@@ -223,7 +229,8 @@ const updateQueue = async (req, res) => {
     if (description) {
       queue.description = description;
     }
-    await queue.save();
+
+    io.to(queueId).emit("queueUpdated");
     return res.status(200).json({
       message: "Queue updated successfully",
       queue,
@@ -239,70 +246,74 @@ const updateQueue = async (req, res) => {
 const pauseQueue = async (req, res) => {
   const { queueId } = req.params;
   const manager = req.user;
-  try{
+  try {
     const queue = await getQueue(manager.tenantId, queueId);
-    if(queue.status === "PAUSED"){
+    if (queue.status === "PAUSED") {
       return res.status(400).json({
         message: "Queue is already paused",
       });
     }
-    if(queue.status === "CLOSED"){
+    if (queue.status === "CLOSED") {
       return res.status(400).json({
         message: "Queue is closed and cannot be paused",
       });
     }
     queue.status = "PAUSED";
     await queue.save();
+    const io = getIo();
+    io.to(queueId).emit("queueUpdated");
     return res.status(200).json({
       message: "Queue paused successfully",
       queue,
     });
-  }catch(error){
+  } catch (error) {
     return res.status(500).json({
       message: "Error pausing queue",
       error: error.message,
     });
   }
-}
+};
 const resumeQueue = async (req, res) => {
   const { queueId } = req.params;
   const manager = req.user;
-  try{
+  try {
     const queue = await getQueue(manager.tenantId, queueId);
-    if(queue.status === "OPEN"){
+    if (queue.status === "OPEN") {
       return res.status(400).json({
         message: "Queue is already open",
       });
     }
-    if(queue.status === "CLOSED"){
+    if (queue.status === "CLOSED") {
       return res.status(400).json({
         message: "Queue is closed and cannot be resumed",
       });
     }
     queue.status = "OPEN";
     await queue.save();
+    const io = getIo();
+    io.to(queueId).emit("queueUpdated");
     return res.status(200).json({
       message: "Queue resumed successfully",
       queue,
     });
-  }catch(error){
+  } catch (error) {
     return res.status(500).json({
       message: "Error resuming queue",
       error: error.message,
     });
   }
-}
+};
 const closeQueue = async (req, res) => {
   const { queueId } = req.params;
   const manager = req.user;
-  try{
+  try {
     const queue = await getQueue(manager.tenantId, queueId);
-    if(queue.status === "CLOSED"){
+    if (queue.status === "CLOSED") {
       return res.status(400).json({
         message: "Queue is already closed",
       });
     }
-    
+
     const activeEntries = await QueueEntry.countDocuments({
       queueId: queue._id,
       status: {
@@ -312,29 +323,32 @@ const closeQueue = async (req, res) => {
 
     if (activeEntries > 0) {
       return res.status(400).json({
-        message: "Cannot close queue while customers are waiting or being served.",
+        message:
+          "Cannot close queue while customers are waiting or being served.",
       });
     }
     queue.status = "CLOSED";
     await queue.save();
+    const io = getIo();
+    io.to(queueId).emit("queueUpdated");
     return res.status(200).json({
       message: "Queue closed successfully",
       queue,
     });
-  }catch(error){
+  } catch (error) {
     return res.status(500).json({
       message: "Error closing queue",
       error: error.message,
     });
   }
-}
+};
 
 const openQueue = async (req, res) => {
   const { queueId } = req.params;
   const manager = req.user;
-  try{
+  try {
     const queue = await getQueue(manager.tenantId, queueId);
-    if(queue.status !== "CLOSED"){
+    if (queue.status !== "CLOSED") {
       return res.status(400).json({
         message: "Queue is not closed",
       });
@@ -345,19 +359,19 @@ const openQueue = async (req, res) => {
     queue.averageServiceTime = 0;
     queue.customersServed = 0;
     await queue.save();
+    const io = getIo();
+    io.to(queueId).emit("queueUpdated");
     return res.status(200).json({
       message: "Queue opened successfully",
       queue,
     });
-  }catch(error){
+  } catch (error) {
     return res.status(500).json({
       message: "Error opening queue",
       error: error.message,
     });
   }
-}
-
-
+};
 
 export {
   createQueue,
@@ -368,6 +382,5 @@ export {
   pauseQueue,
   closeQueue,
   resumeQueue,
-  openQueue
+  openQueue,
 };
-
