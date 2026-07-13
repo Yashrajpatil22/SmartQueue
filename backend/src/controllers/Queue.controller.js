@@ -373,6 +373,27 @@ const openQueue = async (req, res) => {
   }
 };
 
+const getWaitingQueueEntries = async (req, res) => {
+  const { queueId } = req.params;
+  // const manager = req.user;
+  try {
+    // const queue = await getQueue(manager.tenantId, queueId);
+    const queueEntries = await QueueEntry.find({
+      queueId,
+      status: QUEUE_ENTRY_STATUS.WAITING,
+    }).sort({ tokenNumber: 1 });
+    return res.status(200).json({
+      message: "Queue entries fetched successfully",
+      queueEntries,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error fetching queue entries",
+      error: error.message,
+    });
+  }
+};
+
 export {
   createQueue,
   getQueueFromId,
@@ -383,4 +404,5 @@ export {
   closeQueue,
   resumeQueue,
   openQueue,
+  getWaitingQueueEntries,
 };
