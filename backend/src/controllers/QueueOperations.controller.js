@@ -340,6 +340,8 @@ const cancelEntry = async (req, res) => {
     }
     queueEntry.status = "CANCELLED";
     await queueEntry.save();
+    const io = getIo();
+    io.to(queueId).emit("queueUpdated");
     return res.status(200).json({
       message: "Queue entry cancelled successfully",
       cancelledEntry: queueEntry,
