@@ -12,6 +12,11 @@ function QueueDetails() {
     const[nextTokenNumber, setNextTokenNumber] = React.useState(1);
     const[customersServed, setCustomersServed] = React.useState(0);
     const[averageServiceTime, setAverageServiceTime] = React.useState(0);
+    const[totalEntries, setTotalEntries] = React.useState(0);
+    const[waitingEntries, setWaitingEntries] = React.useState(0);
+    const[servedEntries, setServedEntries] = React.useState(0);
+    const[skippedEntries, setSkippedEntries] = React.useState(0);
+    const[cancelledEntries, setCancelledEntries] = React.useState(0);
 
 
     const fetchQueueDetails = async () => {
@@ -36,10 +41,26 @@ function QueueDetails() {
         console.error("Error fetching queue details:", err);
       }
     };
+    const fetchQueueAnalytics = async () => {
+      try{
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/queue/${id}/analytics`, {
+          withCredentials: true,
+        });
+        const analytics = response.data.analytics;
+        setTotalEntries(analytics.totalEntries);
+        setWaitingEntries(analytics.waitingEntries);
+        setServedEntries(analytics.servedEntries);
+        setSkippedEntries(analytics.skippedEntries);
+        setCancelledEntries(analytics.cancelledEntries);
+      }catch(err){
+        console.error("Error fetching queue analytics:", err);
+      }
+    }
 
     useEffect(() => {
         
         fetchQueueDetails();
+        fetchQueueAnalytics();
     }, []);
 
     useEffect(() => {
@@ -49,6 +70,7 @@ function QueueDetails() {
       socket.on("queueUpdated", () => {
         // console.log("Queue updated event received");
         fetchQueueDetails();
+        fetchQueueAnalytics();
       });
 
       return() => {
@@ -141,7 +163,7 @@ function QueueDetails() {
       }
     }
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-8">
       <div className="bg-white p-8 w-150 rounded-2xl shadow-lg border border-gray-200">
         <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">
           Queue Details
@@ -248,6 +270,47 @@ function QueueDetails() {
             >
               Open Queue
             </button>
+          </div>
+        </div>
+
+        <div className="mt-10">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+            Today's Analytics
+          </h2>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
+              <p className="text-sm text-gray-500">Total Entries</p>
+              <p className="text-2xl font-bold text-blue-600">{totalEntries}</p>
+            </div>
+
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
+              <p className="text-sm text-gray-500">Waiting</p>
+              <p className="text-2xl font-bold text-yellow-500">
+                {waitingEntries}
+              </p>
+            </div>
+
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
+              <p className="text-sm text-gray-500">Served</p>
+              <p className="text-2xl font-bold text-green-600">
+                {servedEntries}
+              </p>
+            </div>
+
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
+              <p className="text-sm text-gray-500">Skipped</p>
+              <p className="text-2xl font-bold text-orange-500">
+                {skippedEntries}
+              </p>
+            </div>
+
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
+              <p className="text-sm text-gray-500">Cancelled</p>
+              <p className="text-2xl font-bold text-red-600">
+                {cancelledEntries}
+              </p>
+            </div>
           </div>
         </div>
       </div>

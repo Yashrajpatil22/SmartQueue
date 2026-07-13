@@ -12,6 +12,7 @@ import EditStaff from "./pages/EditStaff";
 import TrackQueue from "./pages/TrackQueue";
 import JoinQueue from "./pages/JoinQueue";
 import EditQueue from "./pages/EditQueue";
+import Analytics from "./pages/Analytics";
 import './App.css'
 
 function App() {
@@ -67,6 +68,11 @@ function App() {
       <Route path="/edit-queue/:id" element={
         <ProtectedRoute>
           <EditQueue />
+        </ProtectedRoute>
+      } />
+      <Route path="/analytics" element={
+        <ProtectedRoute>
+          <Analytics />
         </ProtectedRoute>
       } />
       <Route path="*" element={<Navigate to="/login" />} />
