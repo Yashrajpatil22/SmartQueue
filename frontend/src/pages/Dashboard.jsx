@@ -27,7 +27,8 @@ function Dashboard() {
           onClick={() => navigate("/staff-list")}>
             <h1 className="text-lg font-semibold">Manage Staff</h1>
           </div>
-          <div className="border rounded-lg p-4 bg-white-100 hover:border-blue-500 cursor-pointer transition duration-300">
+          <div className="border rounded-lg p-4 bg-white-100 hover:border-blue-500 cursor-pointer transition duration-300"
+          onClick={() => navigate("/analytics")}>
             <h1 className="text-lg font-semibold">Analytics</h1>
           </div>
           <div className="border rounded-lg p-4 bg-white-100 hover:border-blue-500 cursor-pointer transition duration-300">
