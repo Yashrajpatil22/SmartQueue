@@ -21,22 +21,62 @@ function QueueList() {
         }
         fetchQueues();
     }, [])
+
+    const deleteQueue = async (queueId) => {
+      try{
+        const response = await axios.delete(
+          `${import.meta.env.VITE_API_URL}/api/queue/${queueId}`,
+          {
+            withCredentials: true,
+          }
+        );
+        console.log("Delete Queue response:", response.data);
+        setQueues(queues.filter(queue => queue._id !== queueId));
+      }catch(error){
+        console.log("Error deleting queue:", error);
+      }
+    }
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <h1 className='text-3xl font-bold mb-4'>Queues</h1>
-        {queues.map((queue) => (
-          <div key={queue._id} className="bg-white p-4 shadow mb-4 w-1/2 border border-gray-300 rounded-2xl hover:border-blue-500 cursor-pointer"
-          onClick={() => navigate(`/queue/${queue._id}`)}>
+      <h1 className="text-3xl font-bold mb-4">Queues</h1>
+      {queues.map((queue) => (
+        <div
+          key={queue._id}
+          className="bg-white p-4 shadow mb-4 w-1/2 border border-gray-300 rounded-2xl hover:border-blue-500"
+        >
+          <div
+            className="cursor-pointer"
+            onClick={() => navigate(`/queue/${queue._id}`)}
+          >
             <h2 className="text-xl font-semibold">{queue.name}</h2>
             <h2 className="text-lg text-gray-600">{queue.status}</h2>
           </div>
-        ))}
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
-        onClick={() => navigate("/add-queue")}>
-          Add Queue
-        </button>
+
+          <div className="flex justify-end gap-3 mt-4">
+            <button
+              className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200"
+              onClick={() => navigate(`/edit-queue/${queue._id}`)}
+            >
+              Edit
+            </button>
+
+            <button
+              className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200"
+              onClick={() => deleteQueue(queue._id)}
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      ))}
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
+        onClick={() => navigate("/add-queue")}
+      >
+        Add Queue
+      </button>
     </div>
-  )
+  );
 }
 
 export default QueueList
