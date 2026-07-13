@@ -29,17 +29,23 @@ function Profile() {
     fetchProfile();
   }, []);
   const navigate = useNavigate();
-//   const updateProfile = () => {
-//     try{
-//         const response = axios.put(
-//             `${import.meta.env.VITE_API_URL}/api/auth/update-profile`,
-//             {
-//     }
-//     catch(error){
-//         console.log("Error updating profile:", error);
-//     }
+  const updateProfile = () => {
+    try{
+        const response = axios.put(
+            `${import.meta.env.VITE_API_URL}/api/auth/update-profile`,
+            { name, email },
+            {
+              withCredentials: true,
+            }
+        );
+        console.log("Profile updated successfully:", response.data);
+        navigate("/profile");
+    }
+    catch(error){
+        console.log("Error updating profile:", error);
+    }
     
-//   }
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
