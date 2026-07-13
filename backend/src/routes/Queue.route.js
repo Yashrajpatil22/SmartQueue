@@ -39,7 +39,7 @@ router.route("/:queueId/pause").post(verifyJWT, authorizeRoles("MANAGER"), pause
 router.route("/:queueId/resume").post(verifyJWT, authorizeRoles("MANAGER"), resumeQueue);
 router.route("/:queueId/close").post(verifyJWT, authorizeRoles("MANAGER"), closeQueue);
 router.route("/:queueId/open").post(verifyJWT, authorizeRoles("MANAGER"), openQueue);
-router.route("/:queueId/waiting-entries").get(verifyJWT, authorizeRoles("MANAGER"), getWaitingQueueEntries);
+router.route("/:queueId/waiting-entries").get(verifyJWT, authorizeRoles("MANAGER", "STAFF"), getWaitingQueueEntries);
 
 // Queue Operations Routes
 router.route("/:queueId/join").post(joinQueue);

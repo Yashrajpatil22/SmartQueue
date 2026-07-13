@@ -13,6 +13,7 @@ import TrackQueue from "./pages/TrackQueue";
 import JoinQueue from "./pages/JoinQueue";
 import EditQueue from "./pages/EditQueue";
 import Analytics from "./pages/Analytics";
+import CustomerList from "./pages/CustomerList";
 import './App.css'
 
 function App() {
@@ -73,6 +74,11 @@ function App() {
       <Route path="/analytics" element={
         <ProtectedRoute>
           <Analytics />
+        </ProtectedRoute>
+      } />
+      <Route path="/customer-list/:queueId" element={
+        <ProtectedRoute>
+          <CustomerList />
         </ProtectedRoute>
       } />
       <Route path="*" element={<Navigate to="/login" />} />
