@@ -57,6 +57,20 @@ function TrackQueue() {
       };
     }, [queueId]);
 
+    const handleCancelEntry = async () => {
+      try{
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/queue/${queueId}/entry/${id}/cancel`,
+          {
+            withCredentials: true,
+          }
+        );
+        console.log(response.data);
+      }catch(error){
+        console.error("Error cancelling entry:", error);
+      }
+    }
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white w-full max-w-lg p-8 rounded-2xl shadow-lg border border-gray-200">
@@ -96,6 +110,12 @@ function TrackQueue() {
 
             <p className="font-semibold">{estimatedWait} mins</p>
           </div>
+        </div>
+        <div className="mt-8">
+          <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full cursor-pointer"
+          onClick={() => {handleCancelEntry()}}>
+            Cancel Entry
+          </button>
         </div>
 
       </div>
