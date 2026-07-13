@@ -355,4 +355,5 @@ const cancelEntry = async (req, res) => {
 
 
 
+
 export { joinQueue, callNextCustomer, serveCustomer, skipCustomer, cancelEntry };

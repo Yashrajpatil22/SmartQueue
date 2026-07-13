@@ -1,20 +1,22 @@
-import React,{useState} from 'react'
+import React,{useState, useEffect} from 'react'
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
-function AddQueue() {
+function EditQueue() {
+    const {id} = useParams();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
+
         e.preventDefault();
-        if(!name.trim()){
-            console.error("Queue name is required");
-            return;
-        }
+        // if(!name.trim()){
+        //     console.error("Queue name is required");
+        //     return;
+        // }
         try {
-          const response = await axios.post(
-            `${import.meta.env.VITE_API_URL}/api/queue`,
+          const response = await axios.put(
+            `${import.meta.env.VITE_API_URL}/api/queue/${id}`,
             {
               name,
               description,
@@ -26,15 +28,31 @@ function AddQueue() {
           console.log(response.data);
           navigate("/queue-list");
         } catch (err) {
-          console.error("Error adding queue:", err);
+          console.error("Error Editing queue:", err);
         }
     }
+
+    useEffect(() => {
+      const fetchQueue = async () => {
+        try{
+          const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/queue/${id}`, {
+            withCredentials: true,
+          });
+          const queueData = response.data.queue;
+          setName(queueData.name);
+          setDescription(queueData.description);
+        }catch(error){
+          console.log("Error fetching queue:", error);
+        }
+      }
+      fetchQueue();
+    },[]);
   return (
     <div className="flex flex-col gap-6 items-center justify-center min-h-screen bg-gray-100">
       {/* <h1 className="text-3xl font-bold text-gray-900">SmartQueue</h1> */}
       <div className="p-8 border rounded-2xl w-96 shadow-lg bg-white border-gray-200">
         <h2 className="text-2xl font-bold mb-5 text-center text-gray-900">
-          Add Queue
+          Edit Queue
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-5">
@@ -68,7 +86,7 @@ function AddQueue() {
               type="submit"
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full cursor-pointer"
             >
-              Add Queue
+              Edit Queue
             </button>
           </div>
           
@@ -78,4 +96,4 @@ function AddQueue() {
   );
 }
 
-export default AddQueue
+export default EditQueue

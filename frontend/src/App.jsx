@@ -11,6 +11,7 @@ import AddStaff from "./pages/AddStaff";
 import EditStaff from "./pages/EditStaff";
 import TrackQueue from "./pages/TrackQueue";
 import JoinQueue from "./pages/JoinQueue";
+import EditQueue from "./pages/EditQueue";
 import './App.css'
 
 function App() {
@@ -61,6 +62,11 @@ function App() {
       <Route path="/join-queue/:id" element={
         <ProtectedRoute>
           <JoinQueue />
+        </ProtectedRoute>
+      } />
+      <Route path="/edit-queue/:id" element={
+        <ProtectedRoute>
+          <EditQueue />
         </ProtectedRoute>
       } />
       <Route path="*" element={<Navigate to="/login" />} />
