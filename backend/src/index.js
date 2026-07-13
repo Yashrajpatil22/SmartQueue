@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import staffRouter from "./routes/Staff.route.js";
 import queueRouter from "./routes/Queue.route.js";
+import analyticsRouter from "./routes/Analytics.route.js";
 import { initializeSocket } from "./socket/socket.js";
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(cors(
 app.use("/api/auth", authRouter);
 app.use("/api/staff", staffRouter);
 app.use("/api/queue", queueRouter);
+app.use("/api/analytics", analyticsRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
