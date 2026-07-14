@@ -7,7 +7,7 @@ const api = axios.create({
   withCredentials: true,
 });
 
-const { logout } = useAuth();
+// const { logout } = useAuth();
 
 api.interceptors.response.use(
   (response) => response,
