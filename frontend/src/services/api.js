@@ -1,10 +1,13 @@
 import axios from "axios";
 import refreshApi from "./refreshApi";
+// import useAuth from "../context/AuthContext";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
 });
+
+const { logout } = useAuth();
 
 api.interceptors.response.use(
   (response) => response,
@@ -22,6 +25,8 @@ api.interceptors.response.use(
         return api(error.config);
       } catch (refreshError) {
         console.log("Refresh failed");
+        // logout();
+        window.location.href = "/login";
       }
     }
 
