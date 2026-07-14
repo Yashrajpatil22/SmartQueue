@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
+import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 
 function StaffList() {
@@ -9,8 +10,8 @@ function StaffList() {
     
         const fetchStaff = async () => {
             try {
-              const response = await axios.get(
-                `${import.meta.env.VITE_API_URL}/api/staff`,
+              const response = await api.get(
+                `/api/staff`,
                 {
                   withCredentials: true,
                 },
@@ -26,7 +27,7 @@ function StaffList() {
 
   const deleteStaff = async (staffId) => {
     try{
-        const response = await axios.delete(`${import.meta.env.VITE_API_URL}/api/staff/${staffId}`, {
+        const response = await api.delete(`/api/staff/${staffId}`, {
             withCredentials: true,
         });
         if(response.status === 200){

@@ -16,7 +16,7 @@ import Analytics from "./pages/Analytics";
 import CustomerList from "./pages/CustomerList";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
-import Test from "./pages/Test";
+
 import './App.css'
 
 function App() {
@@ -94,11 +94,7 @@ function App() {
           <EditProfile />
         </ProtectedRoute>
       } />
-      <Route path="/test" element={
-        <ProtectedRoute>
-          <Test />
-        </ProtectedRoute>
-      } />
+      
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   )

@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react'
-import axios from 'axios'
+// import axios from 'axios'
+import api from '../services/api'
 import { useNavigate } from 'react-router-dom'
 
 function QueueList() {
@@ -8,8 +9,8 @@ function QueueList() {
     useEffect(() =>{
         const fetchQueues = async () => {
             try{
-                const response = await axios.get(
-                  `${import.meta.env.VITE_API_URL}/api/queue`,
+                const response = await api.get(
+                  `/api/queue`,
                   {
                     withCredentials: true,
                   }
@@ -24,8 +25,8 @@ function QueueList() {
 
     const deleteQueue = async (queueId) => {
       try{
-        const response = await axios.delete(
-          `${import.meta.env.VITE_API_URL}/api/queue/${queueId}`,
+        const response = await api.delete(
+          `/api/queue/${queueId}`,
           {
             withCredentials: true,
           }

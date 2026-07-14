@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import { useParams } from 'react-router-dom'
-import axios from 'axios'
+// import axios from 'axios'
+import api from '../services/api'
 import { useEffect } from 'react';
 import socket from '../services/socket'
 
@@ -17,8 +18,8 @@ function TrackQueue() {
 
     const fetchQueueStatus = async () => {
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/queue/entry/${id}/status`,
+        const response = await api.get(
+          `/api/queue/entry/${id}/status`,
           {
             withCredentials: true,
           },
@@ -59,8 +60,8 @@ function TrackQueue() {
 
     const handleCancelEntry = async () => {
       try{
-        const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/api/queue/${queueId}/entry/${id}/cancel`,
+        const response = await api.post(
+          `/api/queue/${queueId}/entry/${id}/cancel`,
           {
             withCredentials: true,
           }

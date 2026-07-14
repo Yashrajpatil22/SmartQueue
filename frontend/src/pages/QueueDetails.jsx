@@ -1,28 +1,29 @@
-import React,{useEffect} from 'react'
+import React,{useEffect, useState} from 'react'
 import { useParams } from 'react-router-dom'
-import axios from 'axios'
+// import axios from 'axios'
+import api from '../services/api'
 import socket from '../services/socket'
 
 function QueueDetails() {
     const {id} = useParams();
-    const[name, setName] = React.useState('');
-    const[description, setDescription] = React.useState('');
-    const[status, setStatus] = React.useState('');
-    const[currentServing, setCurrentServing] = React.useState('');
-    const[nextTokenNumber, setNextTokenNumber] = React.useState(1);
-    const[customersServed, setCustomersServed] = React.useState(0);
-    const[averageServiceTime, setAverageServiceTime] = React.useState(0);
-    const[totalEntries, setTotalEntries] = React.useState(0);
-    const[waitingEntries, setWaitingEntries] = React.useState(0);
-    const[servedEntries, setServedEntries] = React.useState(0);
-    const[skippedEntries, setSkippedEntries] = React.useState(0);
-    const[cancelledEntries, setCancelledEntries] = React.useState(0);
+    const[name, setName] = useState('');
+    const[description, setDescription] = useState('');
+    const[status, setStatus] = useState('');
+    const[currentServing, setCurrentServing] = useState('');
+    const[nextTokenNumber, setNextTokenNumber] = useState(1);
+    const[customersServed, setCustomersServed] = useState(0);
+    const[averageServiceTime, setAverageServiceTime] = useState(0);
+    const[totalEntries, setTotalEntries] = useState(0);
+    const[waitingEntries, setWaitingEntries] = useState(0);
+    const[servedEntries, setServedEntries] = useState(0);
+    const[skippedEntries, setSkippedEntries] = useState(0);
+    const[cancelledEntries, setCancelledEntries] = useState(0);
 
 
     const fetchQueueDetails = async () => {
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/queue/${id}`,
+        const response = await api.get(
+          `/api/queue/${id}`,
           {
             withCredentials: true,
           },
@@ -43,7 +44,7 @@ function QueueDetails() {
     };
     const fetchQueueAnalytics = async () => {
       try{
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/queue/${id}/analytics`, {
+        const response = await api.get(`/api/queue/${id}/analytics`, {
           withCredentials: true,
         });
         const analytics = response.data.analytics;
@@ -81,7 +82,7 @@ function QueueDetails() {
 
     const callNext = async () => {
       try{
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/queue/${id}/call-next`, {}, {
+        const response = await api.post(`/api/queue/${id}/call-next`, {}, {
           withCredentials: true,
         });
         console.log("Call Next response:", response.data);
@@ -92,7 +93,7 @@ function QueueDetails() {
 
     const serve = async () => {
       try{
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/queue/${id}/serve`, {}, {
+        const response = await api.post(`/api/queue/${id}/serve`, {}, {
           withCredentials: true,
         });
         console.log("Serve response:", response.data);
@@ -102,7 +103,7 @@ function QueueDetails() {
     }
     const skip = async () => {
       try{
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/queue/${id}/skip`, {}, {
+        const response = await api.post(`/api/queue/${id}/skip`, {}, {
           withCredentials: true,
         });
         console.log("Skip response:", response.data);
@@ -113,7 +114,7 @@ function QueueDetails() {
 
     const pauseQueue = async () => {
       try{
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/queue/${id}/pause`,{},
+        const response = await api.post(`/api/queue/${id}/pause`,{},
           {
           withCredentials: true,
         });
@@ -124,8 +125,8 @@ function QueueDetails() {
     }
     const resumeQueue = async () => {
       try {
-        const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/api/queue/${id}/resume`,{},
+        const response = await api.post(
+          `/api/queue/${id}/resume`,{},
           {
             withCredentials: true,
           },
@@ -138,8 +139,8 @@ function QueueDetails() {
     }
     const closeQueue = async () => {
       try {
-        const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/api/queue/${id}/close`,{},
+        const response = await api.post(
+          `/api/queue/${id}/close`,{},
           {
             withCredentials: true,
           },
@@ -151,8 +152,8 @@ function QueueDetails() {
     }
     const openQueue = async () => {
       try {
-        const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/api/queue/${id}/open`,{},
+        const response = await api.post(
+          `/api/queue/${id}/open`,{},
           {
             withCredentials: true,
           },

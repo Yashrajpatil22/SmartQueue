@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import axios from 'axios'
+// import axios from 'axios'
+import api from '../services/api'
 
 function JoinQueue() {
     const {id} = useParams();
@@ -14,12 +15,9 @@ function JoinQueue() {
 
             const fetchQueueDetails = async () => {
               try{
-                const response = await axios.get(
-                  `${import.meta.env.VITE_API_URL}/api/queue/${id}`,
-                  {
-                    withCredentials: true,
-                  },
-                );
+                const response = await api.get(`/api/queue/${id}`, {
+                  withCredentials: true,
+                });
                 setQueueName(response.data.queue.name);
                 setBusinessName(response.data.tenant.name);
                 // setQueueName(response.data.name);
@@ -36,8 +34,8 @@ function JoinQueue() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try{
-            const response = await axios.post(
-              `${import.meta.env.VITE_API_URL}/api/queue/${id}/join`,
+            const response = await api.post(
+              `/api/queue/${id}/join`,
               { customerName:name, phoneNumber: phone },
               {
                 withCredentials: true,

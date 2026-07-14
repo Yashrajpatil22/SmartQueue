@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
-import axios from 'axios'
+// import axios from 'axios'
+import api from '../services/api'
 import {useNavigate} from 'react-router-dom'
 
 function Profile() {
@@ -12,7 +13,7 @@ function Profile() {
         // Fetch user profile data
         const fetchProfile = async () => {
             try{
-                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
+                const response = await api.get(`/api/auth/me`, {
                     withCredentials: true,
                 });
                 setName(response.data.user.name);

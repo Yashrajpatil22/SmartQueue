@@ -1,5 +1,6 @@
 import React,{useState, useEffect} from 'react'
-import axios from 'axios'
+// import axios from 'axios'
+import api from '../services/api'
 import { useNavigate, useParams } from 'react-router-dom'
 
 function EditQueue() {
@@ -15,8 +16,8 @@ function EditQueue() {
         //     return;
         // }
         try {
-          const response = await axios.put(
-            `${import.meta.env.VITE_API_URL}/api/queue/${id}`,
+          const response = await api.put(
+            `/api/queue/${id}`,
             {
               name,
               description,
@@ -35,7 +36,7 @@ function EditQueue() {
     useEffect(() => {
       const fetchQueue = async () => {
         try{
-          const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/queue/${id}`, {
+          const response = await api.get(`/api/queue/${id}`, {
             withCredentials: true,
           });
           const queueData = response.data.queue;
