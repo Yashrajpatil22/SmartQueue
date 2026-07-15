@@ -76,7 +76,8 @@ function StaffList() {
           </div>
         ))}
 
-        <button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-2xl cursor-pointer transition-colors duration-200">
+        <button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-2xl cursor-pointer transition-colors duration-200"
+        onClick={() => navigate("/add-staff")}>
           Add Staff
         </button>
       </div>

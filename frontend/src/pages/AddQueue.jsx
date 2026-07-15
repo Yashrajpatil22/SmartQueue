@@ -1,15 +1,24 @@
 import React,{useState} from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import AlertBox from '../components/AlertBox'
 
 function AddQueue() {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const [alert, setAlert] = useState({
+        message: '',
+        type: '',
+    });
+
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();
         if(!name.trim()){
-            console.error("Queue name is required");
+            setAlert({
+              message: "Queue name is required.",
+              type: "error",
+            });
             return;
         }
         try {
@@ -24,14 +33,34 @@ function AddQueue() {
             },
           );
           console.log(response.data);
+          setAlert({
+            message: response.data.message,
+            type: 'success',
+          });
           navigate("/queue-list");
         } catch (err) {
+          // console.log("Entered catch");
+          setAlert({
+            message: err.response?.data?.message || 'Something went wrong.',
+            type: 'error',
+          });
+          // console.log(alert)
           console.error("Error adding queue:", err);
         }
     }
   return (
     <div className="flex flex-col gap-6 items-center justify-center min-h-screen bg-gray-100">
-      {/* <h1 className="text-3xl font-bold text-gray-900">SmartQueue</h1> */}
+      <AlertBox
+        message={alert.message}
+        type={alert.type}
+        onClose={() =>
+          setAlert({
+            message: "",
+            type: "",
+          })
+        }
+      />
+
       <div className="p-8 border rounded-2xl w-96 shadow-lg bg-white border-gray-200">
         <h2 className="text-2xl font-bold mb-5 text-center text-gray-900">
           Add Queue
@@ -71,7 +100,6 @@ function AddQueue() {
               Add Queue
             </button>
           </div>
-          
         </form>
       </div>
     </div>

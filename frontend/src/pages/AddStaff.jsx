@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import AlertBox from "../components/AlertBox";
 
 function AddStaff() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const [alert, setAlert] = useState({
+    message: "",
+    type: "",
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,13 +23,31 @@ function AddStaff() {
         },{
             withCredentials: true,
         });
+        setAlert({
+            message: response.data.message,
+            type: "success",
+        });
         navigate("/staff-list");
     }catch(err){
-        console.log("Failed to add staff member:", err);
+      setAlert({
+        message: err.response?.data?.message || "Failed to add staff member.",
+        type: "error",
+      });
+      console.log("Failed to add staff member:", err);
     }
   }
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <AlertBox
+        message={alert.message}
+        type={alert.type}
+        onClose={() =>
+          setAlert({
+            message: "",
+            type: "",
+          })
+        }
+      />
       <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg border border-gray-200">
         <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">
           Add Staff
