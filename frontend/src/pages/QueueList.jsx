@@ -2,9 +2,11 @@ import React, {useEffect} from 'react'
 // import axios from 'axios'
 import api from '../services/api'
 import { useNavigate } from 'react-router-dom'
+import AlertBox from '../components/AlertBox'
 
 function QueueList() {
     const [queues, setQueues] = React.useState([]);
+    const [alert, setAlert] = React.useState({ message: "", type: "" });
     const navigate = useNavigate();
     useEffect(() =>{
         const fetchQueues = async () => {
@@ -17,8 +19,13 @@ function QueueList() {
                 );
                 setQueues(response.data.queues);
             }catch(error){
-                console.log("Error fetching queues:", error)
+              setAlert({
+                message: error.response?.data?.message || "Failed to fetch queues.",
+                type: "error",
+              });
+              console.log("Error fetching queues:", error);
             }
+            
         }
         fetchQueues();
     }, [])
@@ -33,12 +40,30 @@ function QueueList() {
         );
         console.log("Delete Queue response:", response.data);
         setQueues(queues.filter(queue => queue._id !== queueId));
+        setAlert({
+          message: response.data.message,
+          type: 'success',
+        });
       }catch(error){
+        setAlert({
+          message: error.response?.data?.message || 'Failed to delete queue.',
+          type: 'error',
+        });
         console.log("Error deleting queue:", error);
       }
     }
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <AlertBox
+        message={alert.message}
+        type={alert.type}
+        onClose={() =>
+          setAlert({
+            message: "",
+            type: "",
+          })
+        }
+      />
       <h1 className="text-3xl font-bold mb-4">Queues</h1>
       {queues.map((queue) => (
         <div

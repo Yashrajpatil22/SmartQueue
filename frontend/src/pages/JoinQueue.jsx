@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 // import axios from 'axios'
 import api from '../services/api'
+import AlertBox from '../components/AlertBox' 
 
 function JoinQueue() {
     const {id} = useParams();
@@ -10,6 +11,10 @@ function JoinQueue() {
     const [phone, setPhone] = useState('');
     const [queueName, setQueueName] = useState('');
     const [businessName, setBusinessName] = useState('');
+    const [alert, setAlert] = useState({
+        message: '',
+        type: '',
+    });
 
     useEffect(() => {
 
@@ -23,6 +28,10 @@ function JoinQueue() {
                 // setQueueName(response.data.name);
                 // setBusinessName(response.data.businessName);
               }catch(error){
+                setAlert({
+                  message: error.response?.data?.message || 'Failed to fetch queue details.',
+                  type: 'error',
+                });
                 console.error("Error fetching queue details:", error);
               }
             };
@@ -42,8 +51,16 @@ function JoinQueue() {
               },
             );
             console.log("Successfully joined the queue:", response.data);
+            setAlert({
+              message: response.data.message,
+              type: 'success',
+            });
             navigate(`/track-queue/${response.data.queueEntry._id}`);
         }catch(error){
+          setAlert({
+            message: error.response?.data?.message || 'Failed to join the queue.',
+            type: 'error',
+          });
             console.error("Error joining queue:", error);
         }
     }
@@ -51,6 +68,16 @@ function JoinQueue() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <AlertBox
+        message={alert.message}
+        type={alert.type}
+        onClose={() =>
+          setAlert({
+            message: "",
+            type: "",
+          })
+        }
+      />
       <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg border border-gray-200">
         <h1 className="text-3xl font-bold text-center text-gray-900 mb-2">
           SmartQueue

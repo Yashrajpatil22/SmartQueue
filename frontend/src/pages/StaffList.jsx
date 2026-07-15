@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 // import axios from "axios";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
+import AlertBox from "../components/AlertBox";
 
 function StaffList() {
   const [staff, setStaff] = useState([]);
+  const [alert, setAlert] = useState({ message: "", type: "" });
   const navigate = useNavigate();
   useEffect(() => {
     
@@ -18,6 +20,10 @@ function StaffList() {
               );
               setStaff(response.data.staff);
             } catch (err) {
+              setAlert({
+                message: err.response?.data?.message || "Failed to fetch staff data.",
+                type: "error",
+              });
               console.log("Failed to fetch staff data:", err);
             }
         
@@ -33,12 +39,30 @@ function StaffList() {
         if(response.status === 200){
             setStaff(staff.filter(member => member._id !== staffId));
         }
+        setAlert({
+            message: response.data.message,
+            type: "success",
+        });
     }catch(err){
+      setAlert({
+        message: err.response?.data?.message || "Failed to delete staff member.",
+        type: "error",
+      });
         console.log("Failed to delete staff member:", err);
     }
   }
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
+      <AlertBox
+        message={alert.message}
+        type={alert.type}
+        onClose={() =>
+          setAlert({
+            message: "",
+            type: "",
+          })
+        }
+      />
       <h1 className="text-3xl font-bold mb-8 text-gray-900">
         Staff Management
       </h1>

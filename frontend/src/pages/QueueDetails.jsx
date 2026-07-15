@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 // import axios from 'axios'
 import api from '../services/api'
 import socket from '../services/socket'
+import AlertBox from '../components/AlertBox'
 
 function QueueDetails() {
     const {id} = useParams();
@@ -18,6 +19,10 @@ function QueueDetails() {
     const[servedEntries, setServedEntries] = useState(0);
     const[skippedEntries, setSkippedEntries] = useState(0);
     const[cancelledEntries, setCancelledEntries] = useState(0);
+    const [alert, setAlert] = useState({
+        message: '',
+        type: '',
+    });
 
 
     const fetchQueueDetails = async () => {
@@ -39,6 +44,10 @@ function QueueDetails() {
         setCustomersServed(queue.customersServed);
         setAverageServiceTime(queue.averageServiceTime);
       } catch (err) {
+        setAlert({
+          message: err.response?.data?.message || 'Failed to fetch queue details.',
+          type: 'error',
+        });
         console.error("Error fetching queue details:", err);
       }
     };
@@ -54,6 +63,10 @@ function QueueDetails() {
         setSkippedEntries(analytics.skippedEntries);
         setCancelledEntries(analytics.cancelledEntries);
       }catch(err){
+        setAlert({
+          message: err.response?.data?.message || 'Failed to fetch queue analytics.',
+          type: 'error',
+        });
         console.error("Error fetching queue analytics:", err);
       }
     }
@@ -86,7 +99,15 @@ function QueueDetails() {
           withCredentials: true,
         });
         console.log("Call Next response:", response.data);
+        setAlert({
+          message: response.data.message,
+          type: 'success',
+        });
       }catch(err){
+        setAlert({
+          message: err.response?.data?.message || 'Failed to call next token.',
+          type: 'error',
+        });
         console.log("Error calling next token:", err);
       }
     }
@@ -97,7 +118,15 @@ function QueueDetails() {
           withCredentials: true,
         });
         console.log("Serve response:", response.data);
+        setAlert({
+          message: response.data.message,
+          type: 'success',
+        });
       }catch(err){
+        setAlert({
+          message: err.response?.data?.message || 'Failed to serve token.',
+          type: 'error',
+        });
         console.log("Error serving token:", err);
       }
     }
@@ -107,7 +136,15 @@ function QueueDetails() {
           withCredentials: true,
         });
         console.log("Skip response:", response.data);
+        setAlert({
+          message: response.data.message,
+          type: 'success',
+        });
       }catch(err){
+        setAlert({
+          message: err.response?.data?.message || 'Failed to skip token.',
+          type: 'error',
+        });
         console.log("Error skipping token:", err);
       }
     }
@@ -119,7 +156,15 @@ function QueueDetails() {
           withCredentials: true,
         });
         console.log("Pause Queue response:", response.data);
+        setAlert({
+          message: response.data.message,
+          type: 'success',
+        });
       }catch(err){
+        setAlert({
+          message: err.response?.data?.message || 'Failed to pause queue.',
+          type: 'error',
+        });
         console.log("Error pausing queue:", err);
       }
     }
@@ -132,7 +177,15 @@ function QueueDetails() {
           },
         );
         console.log("Resume Queue response:", response.data);
+        setAlert({
+          message: response.data.message,
+          type: 'success',
+        });
       } catch (err) {
+        setAlert({
+          message: err.response?.data?.message || 'Failed to resume queue.',
+          type: 'error',
+        });
         console.log("Error resuming queue:", err);
       }
 
@@ -146,7 +199,15 @@ function QueueDetails() {
           },
         );
         console.log("Close Queue response:", response.data);
+        setAlert({
+          message: response.data.message,
+          type: 'success',
+        });
       } catch (err) {
+        setAlert({
+          message: err.response?.data?.message || 'Failed to close queue.',
+          type: 'error',
+        });
           console.log("Error closing queue:", err);
       }
     }
@@ -159,12 +220,30 @@ function QueueDetails() {
           },
         );
         console.log("Open Queue response:", response.data);
+        setAlert({
+          message: response.data.message,
+          type: 'success',
+        });
       } catch (err) {
+        setAlert({
+          message: err.response?.data?.message || 'Failed to open queue.',
+          type: 'error',
+        });
         console.log("Error opening queue:", err);
       }
     }
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-8">
+      <AlertBox
+        message={alert.message}
+        type={alert.type}
+        onClose={() =>
+          setAlert({
+            message: "",
+            type: "",
+          })
+        }
+      />
       <div className="bg-white p-8 w-150 rounded-2xl shadow-lg border border-gray-200">
         <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">
           Queue Details

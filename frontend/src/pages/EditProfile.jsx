@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import AlertBox from "../components/AlertBox";
 
 function Profile() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
   const [createdAt, setCreatedAt] = useState("");
+  const [alert, setAlert] = useState({
+    message: "",
+    type: "",
+  });
 
   useEffect(() => {
     // Fetch user profile data
@@ -23,6 +28,10 @@ function Profile() {
         setRole(response.data.user.role);
         setCreatedAt(response.data.user.createdAt);
       } catch (error) {
+        setAlert({
+          message: error.response?.data?.message || "Failed to fetch profile.",
+          type: "error",
+        });
         console.log("Error fetching profile:", error);
       }
     };
@@ -39,9 +48,17 @@ function Profile() {
             }
         );
         console.log("Profile updated successfully:", response.data);
+        setAlert({
+            message: response.data.message,
+            type: "success",
+        });
         navigate("/profile");
     }
     catch(error){
+      setAlert({
+        message: error.response?.data?.message || "Failed to update profile.",
+        type: "error",
+      });
         console.log("Error updating profile:", error);
     }
     
@@ -49,6 +66,16 @@ function Profile() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <AlertBox
+        message={alert.message}
+        type={alert.type}
+        onClose={() =>
+          setAlert({
+            message: "",
+            type: "",
+          })
+        }
+      />  
       <div className="bg-white w-full max-w-lg p-8 rounded-2xl shadow-lg border border-gray-200">
         <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">
           My Profile

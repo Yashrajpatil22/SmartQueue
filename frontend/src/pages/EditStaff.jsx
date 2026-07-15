@@ -3,10 +3,15 @@ import React, { useState, useEffect } from "react";
 import api from "../services/api";
 // import { useParams } from "react-router-dom";
 import { useNavigate, useParams } from "react-router-dom";
+import AlertBox from "../components/AlertBox";
 
 function EditStaff() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [alert, setAlert] = useState({
+    message: "",
+    type: "",
+  });
 //   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const {id} = useParams();
@@ -22,6 +27,10 @@ function EditStaff() {
             setEmail(response.data.staff.email);
             // setPassword(response.data.password);
         }catch(err){
+          setAlert({
+            message: err.response?.data?.message || "Failed to fetch staff details.",
+            type: "error",
+          });
             console.log("Failed to fetch staff details:", err);
         }
     }
@@ -42,13 +51,31 @@ function EditStaff() {
           withCredentials: true,
         },
       );
+      setAlert({
+        message: response.data.message,
+        type: "success",
+      });
       navigate("/staff-list");
     } catch (err) {
+      setAlert({
+        message: err.response?.data?.message || "Failed to edit staff member.",
+        type: "error",
+      });
       console.log("Failed to edit staff member:", err);
     }
   };
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <AlertBox
+        message={alert.message}
+        type={alert.type}
+        onClose={() =>
+          setAlert({
+            message: "",
+            type: "",
+          })
+        }
+      />
       <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg border border-gray-200">
         <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">
           Edit Staff

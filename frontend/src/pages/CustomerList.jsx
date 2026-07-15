@@ -1,9 +1,11 @@
 import React,{useState, useEffect} from 'react'
 import axios from 'axios'
 import { useParams } from 'react-router-dom'
+import AlertBox from '../components/AlertBox'
 
 function CustomerList() {
   const [queueEntries, setQueueEntries] = useState([]);
+  const [alert, setAlert] = useState({ message: "", type: "" });
   const {queueId} = useParams();
   useEffect(() => {
     const fetchWaitingQueueEntries = async () => {
@@ -16,6 +18,10 @@ function CustomerList() {
             );
             setQueueEntries(response.data.queueEntries);
         }catch(error){
+            setAlert({
+                message: error.response?.data?.message || 'Failed to fetch waiting queue entries.',
+                type: 'error',
+              });
             console.log("Error fetching waiting queue entries:", error);
         }
     }
@@ -32,14 +38,32 @@ function CustomerList() {
               }
             );
             console.log("Cancel Entry response:", response.data);
+            setAlert({
+                message: response.data.message,
+                type: 'success',
+              });
             setQueueEntries(queueEntries.filter(entry => entry._id !== entryId));
         }catch(error){
+          setAlert({
+            message: error.response?.data?.message || 'Failed to cancel queue entry.',
+            type: 'error',
+          });
             console.log("Error cancelling queue entry:", error);
         }
     }
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-8">
+      <AlertBox
+        message={alert.message}
+        type={alert.type}
+        onClose={() =>
+          setAlert({
+            message: "",
+            type: "",
+          })
+        }
+      />
       <h1 className="text-3xl font-bold text-gray-900 mb-8">
         Waiting Customers
       </h1>

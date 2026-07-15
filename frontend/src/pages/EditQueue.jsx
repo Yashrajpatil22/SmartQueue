@@ -2,11 +2,16 @@ import React,{useState, useEffect} from 'react'
 // import axios from 'axios'
 import api from '../services/api'
 import { useNavigate, useParams } from 'react-router-dom'
+import AlertBox from '../components/AlertBox'
 
 function EditQueue() {
     const {id} = useParams();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const [alert, setAlert] = useState({
+        message: '',
+        type: '',
+    });
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
 
@@ -27,8 +32,16 @@ function EditQueue() {
             },
           );
           console.log(response.data);
+          setAlert({
+            message: response.data.message,
+            type: 'success',
+          });
           navigate("/queue-list");
         } catch (err) {
+          setAlert({
+            message: err.response?.data?.message || 'Something went wrong.',
+            type: 'error',
+          });
           console.error("Error Editing queue:", err);
         }
     }
@@ -43,6 +56,10 @@ function EditQueue() {
           setName(queueData.name);
           setDescription(queueData.description);
         }catch(error){
+          setAlert({
+            message: error.response?.data?.message || 'Failed to fetch queue details.',
+            type: 'error',
+          });
           console.log("Error fetching queue:", error);
         }
       }
@@ -50,7 +67,16 @@ function EditQueue() {
     },[]);
   return (
     <div className="flex flex-col gap-6 items-center justify-center min-h-screen bg-gray-100">
-      {/* <h1 className="text-3xl font-bold text-gray-900">SmartQueue</h1> */}
+      <AlertBox
+        message={alert.message}
+        type={alert.type}
+        onClose={() =>
+          setAlert({
+            message: "",
+            type: "",
+          })
+        }
+      />
       <div className="p-8 border rounded-2xl w-96 shadow-lg bg-white border-gray-200">
         <h2 className="text-2xl font-bold mb-5 text-center text-gray-900">
           Edit Queue

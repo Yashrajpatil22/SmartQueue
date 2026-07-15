@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import api from '../services/api'
 import { useEffect } from 'react';
 import socket from '../services/socket'
+import AlertBox from '../components/AlertBox'
 
 function TrackQueue() {
     const {id} = useParams();
@@ -14,6 +15,10 @@ function TrackQueue() {
     const [status, setStatus] = useState('');
     const [estimatedWait, setEstimatedWait] = useState();
     const [queueId, setQueueId] = useState('');
+    const [alert, setAlert] = useState({
+        message: '',
+        type: '',
+    });
 
 
     const fetchQueueStatus = async () => {
@@ -33,6 +38,10 @@ function TrackQueue() {
         setEstimatedWait(response.data.entry.waitingTimeEstimate);
         setQueueId(response.data.entry.queueId);
       } catch (error) {
+        setAlert({
+          message: error.response?.data?.message || 'Failed to fetch queue status.',
+          type: 'error',
+        });
         console.error("Error fetching queue status:", error);
       }
     };
@@ -67,13 +76,32 @@ function TrackQueue() {
           }
         );
         console.log(response.data);
+        setAlert({
+          message: response.data.message,
+          type: 'success',
+        });
+        setStatus('Cancelled');
       }catch(error){
+        setAlert({
+          message: error.response?.data?.message || 'Failed to cancel entry.',
+          type: 'error',
+        });
         console.error("Error cancelling entry:", error);
       }
     }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <AlertBox
+        message={alert.message}
+        type={alert.type}
+        onClose={() =>
+          setAlert({
+            message: "",
+            type: "",
+          })
+        }
+      />
       <div className="bg-white w-full max-w-lg p-8 rounded-2xl shadow-lg border border-gray-200">
         <h1 className="text-3xl font-bold text-center text-gray-900 mb-2">
           SmartQueue

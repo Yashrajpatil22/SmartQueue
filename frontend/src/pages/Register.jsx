@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import AlertBox from "../components/AlertBox";
 
 function Register() {
   const navigate = useNavigate();
@@ -10,6 +11,10 @@ function Register() {
   const [userName, setUserName] = React.useState("");
   const [tenantName, setTenantName] = React.useState("");
   const [phone, setPhone] = React.useState("");
+  const [alert, setAlert] = React.useState({
+    message: "",
+    type: "",
+  });
   const {login} = useAuth();
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,13 +30,31 @@ function Register() {
       });
       console.log(response.data.registeredUser);
       login(response.data.registeredUser);
+      setAlert({
+        message: response.data.message,
+        type: "success",
+      });
       navigate("/dashboard");
     }catch(err){
+      setAlert({
+        message: err.response?.data?.message || "Something went wrong.",
+        type: "error",
+      });
       console.error("Error occurred while registering:", err);
     }
   }
   return (
     <div className="flex flex-col gap-6 items-center justify-center min-h-screen bg-gray-100">
+      <AlertBox
+        message={alert.message}
+        type={alert.type}
+        onClose={() =>
+          setAlert({
+            message: "",
+            type: "",
+          })
+        }
+      />
       <h1 className="text-3xl font-bold text-gray-900">SmartQueue</h1>
       <div className="p-8 border rounded-2xl w-96 shadow-lg bg-white border-gray-200">
         <h2 className="text-2xl font-bold mb-5 text-center text-gray-900">
