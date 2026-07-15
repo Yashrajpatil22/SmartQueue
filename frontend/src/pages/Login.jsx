@@ -41,12 +41,22 @@ function Login() {
   }
   return (
     <div className="flex flex-col gap-6 items-center justify-center min-h-screen bg-gray-100">
+      <AlertBox
+        message={alert.message}
+        type={alert.type}
+        onClose={() =>
+          setAlert({
+            message: "",
+            type: "",
+          })
+        }
+      />
       <h1 className="text-3xl font-bold text-gray-900">SmartQueue</h1>
       <div className="p-8 border rounded-2xl w-96 shadow-lg bg-white border-gray-200">
         <h2 className="text-2xl font-bold mb-5 text-center text-gray-900">
           Login
         </h2>
-        <AlertBox message={alert.message} type={alert.type} />
+
         <form onSubmit={handleSubmit}>
           <div className="mb-5">
             <label className="block mb-2 font-medium">Email</label>
