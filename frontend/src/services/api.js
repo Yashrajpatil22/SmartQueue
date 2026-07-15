@@ -7,26 +7,37 @@ const api = axios.create({
   withCredentials: true,
 });
 
-const { logout } = useAuth();
+// const { logout } = useAuth();
 
 api.interceptors.response.use(
   (response) => response,
 
   async (error) => {
+    // Don't try to refresh these requests
+    if (
+      error.config.url === "/api/auth/login" ||
+      error.config.url === "/api/auth/register"
+    ) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !error.config._retry) {
-        error.config._retry = true;
+      error.config._retry = true;
+
       console.log("Access token expired");
 
       try {
-        const response = await refreshApi.post("/api/auth/refresh-token");
+        await refreshApi.post("/api/auth/refresh-token");
 
         console.log("Refresh successful");
-        console.log(response.data);
+
         return api(error.config);
       } catch (refreshError) {
         console.log("Refresh failed");
-        // logout();
-        window.location.href = "/login";
+
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
       }
     }
 

@@ -1,13 +1,18 @@
-import React from "react";
+import React,{useState} from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import AlertBox from "../components/AlertBox";
 
 function Login() {
   const navigate = useNavigate();
   const {login} = useAuth();
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [alert, setAlert] = useState({
+    message: "",
+    type: "",
+  });
   const handleSubmit = async (e) => {
     e.preventDefault();
     try{
@@ -20,11 +25,18 @@ function Login() {
   });
     console.log(response.data.registeredUser);
     login(response.data.registeredUser);
-
+    setAlert({
+      message: response.data.message,
+      type: "success",
+    });
 
     navigate("/dashboard");
     }catch(err){
       console.error(err);
+      setAlert({
+        message: err.response?.data?.message || "Something went wrong.",
+        type: "error",
+      });
     }
   }
   return (
@@ -34,6 +46,7 @@ function Login() {
         <h2 className="text-2xl font-bold mb-5 text-center text-gray-900">
           Login
         </h2>
+        <AlertBox message={alert.message} type={alert.type} />
         <form onSubmit={handleSubmit}>
           <div className="mb-5">
             <label className="block mb-2 font-medium">Email</label>
