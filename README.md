@@ -6,9 +6,9 @@ Built with the MERN Stack, Socket.IO, JWT Authentication, and Redis-ready archit
 
 ##  Live Demo
 
-Frontend: https://your-vercel-url
+Frontend: https://smart-queue-pied.vercel.app
 
-Backend API: https://your-render-url
+Backend API: https://smartqueue-backend-h96o.onrender.com
 
 ##  Project Overview
 
