@@ -1,19 +1,19 @@
 import axios from "axios";
 import refreshApi from "./refreshApi";
-// import useAuth from "../context/AuthContext";
+
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
 });
 
-// const { logout } = useAuth();
+
 
 api.interceptors.response.use(
   (response) => response,
 
   async (error) => {
-    // Don't try to refresh these requests
+    
     if (
       error.config.url === "/api/auth/login" ||
       error.config.url === "/api/auth/register"
