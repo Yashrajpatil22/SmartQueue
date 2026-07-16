@@ -1,70 +1,67 @@
-import React, {useState, useEffect} from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 // import api from '../services/api'
-import AlertBox from '../components/AlertBox' 
+import AlertBox from "../components/AlertBox";
 
 function JoinQueue() {
-    const {id} = useParams();
-    const navigate = useNavigate();
-    const [name, setName] = useState('');
-    const [phone, setPhone] = useState('');
-    const [queueName, setQueueName] = useState('');
-    const [businessName, setBusinessName] = useState('');
-    const [alert, setAlert] = useState({
-        message: '',
-        type: '',
-    });
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [queueName, setQueueName] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [alert, setAlert] = useState({
+    message: "",
+    type: "",
+  });
 
-    useEffect(() => {
+  useEffect(() => {
+    const fetchQueueDetails = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/customer/${id}`);
+          // console.log(`${import.meta.env.VITE_API_URL}/api/customer/${id}`);
+        // console.log(response);
+        setQueueName(response.data.queueName);
+        // console.log("Queue Name:", response.data.queueName);
+        setBusinessName(response.data.businessName);
+        // console.log("Business Name:", response.data.businessName);
+        // setQueueName(response.data.name);
+        // setBusinessName(response.data.businessName);
+      } catch (error) {
+        setAlert({
+          message:
+            error.response?.data?.message || "Failed to fetch queue details.",
+          type: "error",
+        });
+        console.error("Error fetching queue details:", error);
+      }
+    };
+    fetchQueueDetails();
+  }, []);
 
-            const fetchQueueDetails = async () => {
-              try{
-                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/queue/${id}`, {
-                  withCredentials: true,
-                });
-                setQueueName(response.data.queue.name);
-                setBusinessName(response.data.tenant.name);
-                // setQueueName(response.data.name);
-                // setBusinessName(response.data.businessName);
-              }catch(error){
-                setAlert({
-                  message: error.response?.data?.message || 'Failed to fetch queue details.',
-                  type: 'error',
-                });
-                console.error("Error fetching queue details:", error);
-              }
-            };
-            fetchQueueDetails();
-            
-        
-    },[]);
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try{
-            const response = await axios.post(
-              `${import.meta.env.VITE_API_BASE_URL}/api/queue/${id}/join`,
-              { customerName:name, phoneNumber: phone },
-              {
-                withCredentials: true,
-              },
-            );
-            console.log("Successfully joined the queue:", response.data);
-            setAlert({
-              message: response.data.message,
-              type: 'success',
-            });
-            navigate(`/track-queue/${response.data.queueEntry._id}`);
-        }catch(error){
-          setAlert({
-            message: error.response?.data?.message || 'Failed to join the queue.',
-            type: 'error',
-          });
-            console.error("Error joining queue:", error);
-        }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/queue/${id}/join`,
+        { customerName: name, phoneNumber: phone }
+      );
+      console.log("Successfully joined the queue:", response.data);
+      setAlert({
+        message: response.data.message,
+        type: "success",
+      });
+      navigate(`/track-queue/${response.data.queueEntry._id}`);
+    } catch (error) {
+      setAlert({
+        message: error.response?.data?.message || "Failed to join the queue.",
+        type: "error",
+      });
+      console.error("Error joining queue:", error);
     }
-
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -130,4 +127,4 @@ function JoinQueue() {
   );
 }
 
-export default JoinQueue
+export default JoinQueue;

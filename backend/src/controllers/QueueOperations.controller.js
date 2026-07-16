@@ -77,6 +77,8 @@ const joinQueue = async (req, res) => {
     // await queue.save({session});
     await session.commitTransaction();
     await session.endSession();
+    const io = getIo();
+    io.to(queueId).emit("queueUpdated");
     return res.status(201).json({
       message: "Customer joined the queue successfully",
       queueEntry,

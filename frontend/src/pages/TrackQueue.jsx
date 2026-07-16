@@ -24,11 +24,7 @@ function TrackQueue() {
     const fetchQueueStatus = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/api/queue/entry/${id}/status`,
-          {
-            withCredentials: true,
-          },
-        );
+          `${import.meta.env.VITE_API_URL}/api/customer/entry/${id}`);
         // console.log(response.data);
         setQueueName(response.data.entry.queueName);
         setBusinessName(response.data.entry.businessName);
@@ -73,11 +69,7 @@ function TrackQueue() {
       }
       try{
         const response = await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}/api/queue/${queueId}/entry/${id}/cancel`,
-          {
-            withCredentials: true,
-          }
-        );
+          `${import.meta.env.VITE_API_URL}/api/queue/${queueId}/entry/${id}/cancel`);
         console.log(response.data);
         setAlert({
           message: response.data.message,
