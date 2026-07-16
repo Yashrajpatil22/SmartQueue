@@ -1,5 +1,6 @@
 import React,{useState} from 'react'
-import axios from 'axios'
+// import axios from 'axios'
+import api from '../services/api'
 import { useNavigate } from 'react-router-dom'
 import AlertBox from '../components/AlertBox'
 
@@ -22,8 +23,8 @@ function AddQueue() {
             return;
         }
         try {
-          const response = await axios.post(
-            `${import.meta.env.VITE_API_URL}/api/queue`,
+          const response = await api.post(
+            "/api/queue",
             {
               name,
               description,

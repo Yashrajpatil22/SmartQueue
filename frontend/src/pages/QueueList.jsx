@@ -1,12 +1,12 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 // import axios from 'axios'
 import api from '../services/api'
 import { useNavigate } from 'react-router-dom'
 import AlertBox from '../components/AlertBox'
 
 function QueueList() {
-    const [queues, setQueues] = React.useState([]);
-    const [alert, setAlert] = React.useState({ message: "", type: "" });
+    const [queues, setQueues] = useState([]);
+    const [alert, setAlert] = useState({ message: "", type: "" });
     const navigate = useNavigate();
     useEffect(() =>{
         const fetchQueues = async () => {

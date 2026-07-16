@@ -1,5 +1,6 @@
 import React,{useState, useEffect} from 'react'
-import axios from 'axios'
+// import axios from 'axios'
+import api from '../services/api'
 import { useParams } from 'react-router-dom'
 import AlertBox from '../components/AlertBox'
 
@@ -10,8 +11,8 @@ function CustomerList() {
   useEffect(() => {
     const fetchWaitingQueueEntries = async () => {
         try{
-            const response = await axios.get(
-              `${import.meta.env.VITE_API_URL}/api/queue/${queueId}/waiting-entries`,
+            const response = await api.get(
+              `/api/queue/${queueId}/waiting-entries`,
               {
                 withCredentials: true,
               }
@@ -30,8 +31,8 @@ function CustomerList() {
 
     const cancelEntry = async (entryId) => {
         try{
-            const response = await axios.post(
-              `${import.meta.env.VITE_API_URL}/api/queue/${queueId}/entry/${entryId}/cancel`,
+            const response = await api.post(
+              `/api/queue/${queueId}/entry/${entryId}/cancel`,
               {},
               {
                 withCredentials: true,

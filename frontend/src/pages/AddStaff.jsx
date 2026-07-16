@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
+// import axios from "axios";
+import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 import AlertBox from "../components/AlertBox";
 
@@ -16,7 +17,7 @@ function AddStaff() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try{
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/staff/create`, {
+        const response = await api.post("/api/staff/create", {
             name,
             email,
             password

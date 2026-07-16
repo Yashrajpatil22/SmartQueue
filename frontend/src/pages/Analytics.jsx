@@ -1,5 +1,6 @@
 import React,{useState, useEffect} from 'react'
-import axios from 'axios'
+// import axios from 'axios'
+import api from '../services/api'
 import AlertBox from '../components/AlertBox';
 // import {useNavigate} from 'react-router-dom'
 
@@ -24,8 +25,8 @@ function Analytics() {
         const fetchAnalytics = async () => {
             {
                 try{
-                    const response = await axios.get(
-                      `${import.meta.env.VITE_API_URL}/api/analytics`,
+                    const response = await api.get(
+                      "/api/analytics",
                       {
                         withCredentials: true,
                       },

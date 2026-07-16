@@ -1,17 +1,18 @@
-import React from "react";
+import React,{useState} from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
+import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import AlertBox from "../components/AlertBox";
 
 function Register() {
   const navigate = useNavigate();
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [userName, setUserName] = React.useState("");
-  const [tenantName, setTenantName] = React.useState("");
-  const [phone, setPhone] = React.useState("");
-  const [alert, setAlert] = React.useState({
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [userName, setUserName] = useState("");
+  const [tenantName, setTenantName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [alert, setAlert] = useState({
     message: "",
     type: "",
   });
@@ -19,7 +20,7 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try{
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
+      const response = await api.post("/api/auth/register", {
         tenantName,
         phone,
         userName,
