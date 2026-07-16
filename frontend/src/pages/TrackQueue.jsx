@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import { useParams } from 'react-router-dom'
-// import axios from 'axios'
-import api from '../services/api'
+import axios from 'axios'
+// import api from '../services/api'
 import { useEffect } from 'react';
 import socket from '../services/socket'
 import AlertBox from '../components/AlertBox'
@@ -23,8 +23,8 @@ function TrackQueue() {
 
     const fetchQueueStatus = async () => {
       try {
-        const response = await api.get(
-          `/api/queue/entry/${id}/status`,
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/api/queue/entry/${id}/status`,
           {
             withCredentials: true,
           },
@@ -72,8 +72,8 @@ function TrackQueue() {
         return;
       }
       try{
-        const response = await api.post(
-          `/api/queue/${queueId}/entry/${id}/cancel`,
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/api/queue/${queueId}/entry/${id}/cancel`,
           {
             withCredentials: true,
           }

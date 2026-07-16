@@ -1,12 +1,26 @@
-import React, { useEffect, createContext, useContext } from "react";
+import React, { useEffect, createContext, useContext, useState } from "react";
 // import axios from "axios";
 import api from "../services/api";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const publicRoutes = ["/login", "/register", "/join-queue", "/track-queue"];
+
+    const isPublic = publicRoutes.some((route) =>
+      window.location.pathname.startsWith(route),
+    );
+
+    if (!isPublic) {
+      checkAuth();
+    } else {
+      setLoading(false);
+    }
+  }, []);
 
   const checkAuth = async () => {
     try {
@@ -28,9 +42,6 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
 
   return (
     <AuthContext.Provider value={{ user, loading, checkAuth, login, logout }}>
