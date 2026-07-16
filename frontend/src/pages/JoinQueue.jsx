@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-// import axios from 'axios'
-import api from '../services/api'
+import axios from 'axios'
+// import api from '../services/api'
 import AlertBox from '../components/AlertBox' 
 
 function JoinQueue() {
@@ -20,7 +20,7 @@ function JoinQueue() {
 
             const fetchQueueDetails = async () => {
               try{
-                const response = await api.get(`/api/queue/${id}`, {
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/queue/${id}`, {
                   withCredentials: true,
                 });
                 setQueueName(response.data.queue.name);
@@ -43,8 +43,8 @@ function JoinQueue() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try{
-            const response = await api.post(
-              `/api/queue/${id}/join`,
+            const response = await axios.post(
+              `${import.meta.env.VITE_API_BASE_URL}/api/queue/${id}/join`,
               { customerName:name, phoneNumber: phone },
               {
                 withCredentials: true,

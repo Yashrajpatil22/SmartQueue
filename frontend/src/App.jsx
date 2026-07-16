@@ -65,9 +65,7 @@ function App() {
         </ProtectedRoute>
       } />
       <Route path="/join-queue/:id" element={
-        <ProtectedRoute>
           <JoinQueue />
-        </ProtectedRoute>
       } />
       <Route path="/edit-queue/:id" element={
         <ProtectedRoute>
