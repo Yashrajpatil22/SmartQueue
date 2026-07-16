@@ -21,7 +21,6 @@ function AlertBox({ message, type, onClose }) {
             : "bg-red-600"
         }`}
       >
-        {type === "success" ? "✅ " : "❌ "}
         {message}
       </div>
     </div>

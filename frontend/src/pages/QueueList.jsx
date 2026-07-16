@@ -56,6 +56,15 @@ function QueueList() {
       }
     }
 
+    const handleCopyJoinLink = async (queueId) => {
+      const joinLink = `${window.location.origin}/join-queue/${queueId}`;
+      await navigator.clipboard.writeText(joinLink);
+      setAlert({
+        message: "Join link copied to clipboard!",
+        type: "success",
+      });
+    }
+
   if (queues.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
@@ -104,6 +113,12 @@ function QueueList() {
           </div>
 
           <div className="flex justify-end gap-3 mt-4">
+            <button
+              className="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200"
+              onClick={() => handleCopyJoinLink(queue._id)}
+            >
+              Copy Join Link
+            </button>
             <button
               className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200"
               onClick={() => navigate(`/edit-queue/${queue._id}`)}
