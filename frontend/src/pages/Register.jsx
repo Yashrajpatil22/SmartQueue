@@ -114,7 +114,7 @@ function Register() {
             <label className="block mb-2 font-medium">Password</label>
             <div className="relative">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter your password"
                 value={password}

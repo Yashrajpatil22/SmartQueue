@@ -55,6 +55,28 @@ function QueueList() {
         console.log("Error deleting queue:", error);
       }
     }
+
+  if (queues.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          No Queues Found
+        </h1>
+
+        <p className="text-gray-600 mb-6">
+          Create your first queue to get started.
+        </p>
+
+        <button
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg"
+          onClick={() => navigate("/add-queue")}
+        >
+          Add Queue
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <AlertBox

@@ -56,6 +56,19 @@ function CustomerList() {
         }
     }
 
+  if (queueEntries.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          No Waiting Customers
+        </h1>
+        <p className="text-gray-600 mb-6">
+          There are currently no customers in this queue.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-8">
       <AlertBox

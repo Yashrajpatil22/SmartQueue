@@ -54,6 +54,28 @@ function StaffList() {
         console.log("Failed to delete staff member:", err);
     }
   }
+
+  if (staff.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          No Staff Members Found
+        </h1>
+
+        <p className="text-gray-600 mb-6">
+          Create your first staff member to get started.
+        </p>
+
+        <button
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg"
+          onClick={() => navigate("/add-staff")}
+        >
+          Add Staff
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
       <AlertBox
