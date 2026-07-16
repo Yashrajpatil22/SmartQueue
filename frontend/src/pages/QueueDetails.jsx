@@ -297,22 +297,39 @@ function QueueDetails() {
 
           <div className="grid grid-cols-3 gap-4">
             <button
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg cursor-pointer transition-colors duration-200"
+              className={`font-semibold py-2 rounded-lg transition-colors duration-200 ${
+                status !== "OPEN" || waitingEntries === 0 || currentServing
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+              }`}
               onClick={callNext}
+              disabled={
+                status !== "OPEN" || waitingEntries === 0 || currentServing
+              }
             >
               Call Next
             </button>
 
             <button
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg cursor-pointer transition-colors duration-200"
+              className={`font-semibold py-2 rounded-lg transition-colors duration-200 ${
+                status !== "OPEN" || !currentServing
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700 text-white cursor-pointer"
+              }`}
               onClick={serve}
+              disabled={status !== "OPEN" || !currentServing}
             >
               Serve
             </button>
 
             <button
-              className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg cursor-pointer transition-colors duration-200"
+              className={`font-semibold py-2 rounded-lg transition-colors duration-200 ${
+                status !== "OPEN" || !currentServing
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-yellow-500 hover:bg-yellow-600 text-white cursor-pointer"
+              }`}
               onClick={skip}
+              disabled={status !== "OPEN" || !currentServing}
             >
               Skip
             </button>
@@ -324,29 +341,49 @@ function QueueDetails() {
 
           <div className="grid grid-cols-2 gap-4">
             <button
-              className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 rounded-lg cursor-pointer transition-colors duration-200"
+              className={`font-semibold py-2 rounded-lg transition-colors duration-200 ${
+                status === "PAUSED" || status === "CLOSED"
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
+              }`}
               onClick={pauseQueue}
+              disabled={status === "PAUSED" || status === "CLOSED"}
             >
               Pause Queue
             </button>
 
             <button
-              className="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 rounded-lg cursor-pointer transition-colors duration-200"
+              className={`font-semibold py-2 rounded-lg transition-colors duration-200 ${
+                status === "OPEN" || status === "CLOSED"
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-teal-600 hover:bg-teal-700 text-white cursor-pointer"
+              }`}
               onClick={resumeQueue}
+              disabled={status === "OPEN" || status === "CLOSED"}
             >
               Resume Queue
             </button>
 
             <button
-              className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg cursor-pointer transition-colors duration-200"
+              className={`font-semibold py-2 rounded-lg transition-colors duration-200 ${
+                status === "CLOSED"
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-red-600 hover:bg-red-700 text-white cursor-pointer"
+              }`}
               onClick={closeQueue}
+              disabled={status === "CLOSED"}
             >
               Close Queue
             </button>
 
             <button
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg cursor-pointer transition-colors duration-200"
+              className={`font-semibold py-2 rounded-lg transition-colors duration-200 ${
+                status !== "CLOSED"
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer"
+              }`}
               onClick={openQueue}
+              disabled={status !== "CLOSED"}
             >
               Open Queue
             </button>
