@@ -2,32 +2,50 @@ import React,{useState, useEffect} from 'react'
 // import axios from 'axios'
 import api from '../services/api'
 import { useParams } from 'react-router-dom'
+import socket from '../services/socket'
 import AlertBox from '../components/AlertBox'
 
 function CustomerList() {
   const [queueEntries, setQueueEntries] = useState([]);
   const [alert, setAlert] = useState({ message: "", type: "" });
   const {queueId} = useParams();
+  
+const fetchWaitingQueueEntries = async () => {
+  try {
+    const response = await api.get(`/api/queue/${queueId}/waiting-entries`, {
+      withCredentials: true,
+    });
+    setQueueEntries(response.data.queueEntries);
+  } catch (error) {
+    setAlert({
+      message:
+        error.response?.data?.message ||
+        "Failed to fetch waiting queue entries.",
+      type: "error",
+    });
+    console.log("Error fetching waiting queue entries:", error);
+  }
+};
+
   useEffect(() => {
-    const fetchWaitingQueueEntries = async () => {
-        try{
-            const response = await api.get(
-              `/api/queue/${queueId}/waiting-entries`,
-              {
-                withCredentials: true,
-              }
-            );
-            setQueueEntries(response.data.queueEntries);
-        }catch(error){
-            setAlert({
-                message: error.response?.data?.message || 'Failed to fetch waiting queue entries.',
-                type: 'error',
-              });
-            console.log("Error fetching waiting queue entries:", error);
-        }
-    }
+    
     fetchWaitingQueueEntries();
   },[]);
+
+  useEffect(() => {
+    socket.connect();
+
+    socket.emit("joinQueue", queueId);
+
+    socket.on("queueUpdated", () => {
+      fetchWaitingQueueEntries();
+    });
+
+    return () => {
+      socket.off("queueUpdated");
+      socket.disconnect();
+    };
+  }, [queueId]);
 
     const cancelEntry = async (entryId) => {
       if (!window.confirm("Are you sure you want to cancel this queue entry?")) {
