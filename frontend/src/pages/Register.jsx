@@ -1,9 +1,10 @@
-import React,{useState} from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import axios from "axios";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import AlertBox from "../components/AlertBox";
+import { Eye, EyeOff } from "lucide-react";
 
 function Register() {
   const navigate = useNavigate();
@@ -16,19 +17,24 @@ function Register() {
     message: "",
     type: "",
   });
-  const {login} = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const { login } = useAuth();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
-      const response = await api.post("/api/auth/register", {
-        tenantName,
-        phone,
-        userName,
-        email,
-        password,
-      },{
-        withCredentials: true,
-      });
+    try {
+      const response = await api.post(
+        "/api/auth/register",
+        {
+          tenantName,
+          phone,
+          userName,
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        },
+      );
       console.log(response.data.registeredUser);
       login(response.data.registeredUser);
       setAlert({
@@ -36,14 +42,14 @@ function Register() {
         type: "success",
       });
       navigate("/dashboard");
-    }catch(err){
+    } catch (err) {
       setAlert({
         message: err.response?.data?.message || "Something went wrong.",
         type: "error",
       });
       console.error("Error occurred while registering:", err);
     }
-  }
+  };
   return (
     <div className="flex flex-col gap-6 items-center justify-center min-h-screen bg-gray-100">
       <AlertBox
@@ -106,13 +112,22 @@ function Register() {
           </div>
           <div className="mb-5">
             <label className="block mb-2 font-medium">Password</label>
-            <input
-              type="password"
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="relative">
+              <input
+                type="password"
+                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
           <div className="flex justify-center">
             <button

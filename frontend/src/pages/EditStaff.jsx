@@ -4,6 +4,7 @@ import api from "../services/api";
 // import { useParams } from "react-router-dom";
 import { useNavigate, useParams } from "react-router-dom";
 import AlertBox from "../components/AlertBox";
+// import { Eye, EyeOff } from "lucide-react";
 
 function EditStaff() {
   const [name, setName] = useState("");
@@ -12,6 +13,7 @@ function EditStaff() {
     message: "",
     type: "",
   });
+  // const [showPassword, setShowPassword] = useState(false);
 //   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const {id} = useParams();

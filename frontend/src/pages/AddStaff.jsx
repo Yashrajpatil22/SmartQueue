@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 import AlertBox from "../components/AlertBox";
+import { Eye, EyeOff } from "lucide-react";
 
 function AddStaff() {
   const [name, setName] = useState("");
@@ -13,30 +14,35 @@ function AddStaff() {
     message: "",
     type: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
-        const response = await api.post("/api/staff/create", {
-            name,
-            email,
-            password
-        },{
-            withCredentials: true,
-        });
-        setAlert({
-            message: response.data.message,
-            type: "success",
-        });
-        navigate("/staff-list");
-    }catch(err){
+    try {
+      const response = await api.post(
+        "/api/staff/create",
+        {
+          name,
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        },
+      );
+      setAlert({
+        message: response.data.message,
+        type: "success",
+      });
+      navigate("/staff-list");
+    } catch (err) {
       setAlert({
         message: err.response?.data?.message || "Failed to add staff member.",
         type: "error",
       });
       console.log("Failed to add staff member:", err);
     }
-  }
+  };
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <AlertBox
@@ -83,13 +89,22 @@ function AddStaff() {
             <label className="block mb-2 font-medium text-gray-700">
               Password
             </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter password"
-            />
+            <div className="relative">
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter password"
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
 
           <button
