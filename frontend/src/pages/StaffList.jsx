@@ -32,6 +32,9 @@ function StaffList() {
   }, []);
 
   const deleteStaff = async (staffId) => {
+    if (!window.confirm("Are you sure you want to delete this staff member?")) {
+      return;
+    }
     try{
         const response = await api.delete(`/api/staff/${staffId}`, {
             withCredentials: true,

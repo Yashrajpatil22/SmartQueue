@@ -31,6 +31,9 @@ function QueueList() {
     }, [])
 
     const deleteQueue = async (queueId) => {
+      if (!window.confirm("Are you sure you want to delete this queue?")) {
+        return;
+      }
       try{
         const response = await api.delete(
           `/api/queue/${queueId}`,

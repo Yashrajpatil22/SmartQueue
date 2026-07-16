@@ -5,10 +5,17 @@ import { useNavigate } from 'react-router-dom';
 function Dashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const handleLogout = () => {
+    if (!window.confirm("Are you sure you want to logout?")) {
+      return;
+    }
+    logout();
+    navigate('/login');
+  }
   return (
     <div className = "relative bg-gray-100 min-h-screen flex flex-col items-center justify-center gap-6">
       <div>
-        <button className="absolute top-6 right-6 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded cursor-pointer" onClick={logout}>Logout</button>
+        <button className="absolute top-6 right-6 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded cursor-pointer" onClick={handleLogout}>Logout</button>
       </div>
       <div className=" flex flex-col items-center justify-center gap-6">
         <div>

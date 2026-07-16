@@ -30,6 +30,9 @@ function CustomerList() {
   },[]);
 
     const cancelEntry = async (entryId) => {
+      if (!window.confirm("Are you sure you want to cancel this queue entry?")) {
+        return;
+      }
         try{
             const response = await api.post(
               `/api/queue/${queueId}/entry/${entryId}/cancel`,

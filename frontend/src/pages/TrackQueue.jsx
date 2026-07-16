@@ -68,6 +68,9 @@ function TrackQueue() {
     }, [queueId]);
 
     const handleCancelEntry = async () => {
+      if (!window.confirm("Are you sure you want to cancel this entry?")) {
+        return;
+      }
       try{
         const response = await api.post(
           `/api/queue/${queueId}/entry/${id}/cancel`,
